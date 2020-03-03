@@ -1,10 +1,19 @@
 public class main {
     public static void main() {
         while(true) {
+            //TODO
             //wake up
+
+            //TODO
             //check for previous days file
-            //do everything
-            //sleep
+
+            for (String line : dailyTransactionFile) {
+                //TODO
+                //process line by calling parser function corresponding to transaction code
+            }
+
+            //TODO
+            //sleep until midnight of current day
         }
 
     }
