@@ -1,3 +1,8 @@
+/*
+Description: This classes purpose is to handle all of the different File IO needs of our
+program. This does things like read in all of the different flies, the users file, read items file
+
+*/
 import java.util.ArrayList;
 import java.io.*;
 
@@ -11,8 +16,13 @@ public class FileIO{
 
     }*/
 
-    public static boolean dailyProcess(ArrayList<user> users, ArrayList<Item> items, ArrayList<String> transactions){
+    public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items, ArrayList<String> transactions){
 
+        return true;
+    }
+
+    public static boolean writeFiles(ArrayList<user> users, ArrayList<Item> items){
+        
         return true;
     }
 
@@ -27,7 +37,6 @@ public class FileIO{
     }
 
     public static boolean readTransactionFile(ArrayList<String> transacitons){
-
 
         return true;
     }
