@@ -1,4 +1,8 @@
+import java.util.ArrayList;
+
 public class parser {
+    static ArrayList<String> updatedCurrentUserAccounts;
+    static ArrayList<String> updatedItems;
     static void addCredit() {
 
     }
