@@ -10,6 +10,7 @@ public class main {
             for (String line : dailyTransactionFile) {
                 //TODO
                 //process line by calling parser function corresponding to transaction code
+                
             }
 
             //TODO
