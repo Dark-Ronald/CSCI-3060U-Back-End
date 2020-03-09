@@ -16,6 +16,10 @@ public class FileIO{
 
     }*/
 
+    public static ArrayList<String> dailyTransactionFile;
+    public static ArrayList<String> currentUserAccounts;
+    public static ArrayList<String> availableItems;
+
     public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items, ArrayList<String> transactions){
 
         return true;

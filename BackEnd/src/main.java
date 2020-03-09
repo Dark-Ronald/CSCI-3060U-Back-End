@@ -7,10 +7,11 @@ public class main {
             //TODO
             //check for previous days file
 
-            for (String line : dailyTransactionFile) {
+            for (String line : FileIO.dailyTransactionFile) {
                 //TODO
                 //process line by calling parser function corresponding to transaction code
-                
+
+
             }
 
             //TODO
