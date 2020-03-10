@@ -1,10 +1,18 @@
 import java.util.ArrayList;
 
 public class parser {
-    static ArrayList<String> updatedCurrentUserAccounts;
-    static ArrayList<String> updatedItems;
-    static void addCredit() {
-
+    static ArrayList<String> currentUserAccounts;
+    static ArrayList<String> availableItems;
+    static void addCredit(String transaction) {
+        String Username = transaction.substring(3, 18);
+        String Credit = transaction.substring(23, 31);
+        for (int i = 0; i < currentUserAccounts.size(); i++) {
+            String userAccount = currentUserAccounts.get(i);
+            if (Username.compareTo(userAccount.substring(3, 18)) == 0) {
+                currentUserAccounts.add(i, userAccount.substring(0, 22).concat(Credit));
+                break;
+            }
+        }
     }
     static void advertise() {
 
