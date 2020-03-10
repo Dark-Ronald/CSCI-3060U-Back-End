@@ -11,6 +11,8 @@ public class FileIO{
 
     }*/
 
+    public static ArrayList<String> dailyTransactionFile;
+
     public static boolean dailyProcess(ArrayList<user> users, ArrayList<Item> items, ArrayList<String> transactions){
 
         return true;
