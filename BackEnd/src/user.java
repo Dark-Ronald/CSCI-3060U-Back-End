@@ -1,4 +1,4 @@
-public class user {
+public class User {
     userTypes userType;
     String username;
     double credit;
@@ -14,7 +14,7 @@ public class user {
         }
     }
 
-    user(String username, String userType, String credit) {
+    User(String username, String userType, String credit) {
         this.username = username;
         if (userType.compareTo("AA") == 0) {
             this.userType = userTypes.ADMIN;
