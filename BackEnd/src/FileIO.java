@@ -12,9 +12,9 @@ import java.io.*;
 
 public class FileIO{
 
-    private String userFilePath;
-    private String itemFilePath;
-    private String transactionFilePath;
+    private static String userFilePath;
+    private static String itemFilePath;
+    private static String transactionFilePath;
 
     /* 
     Description: A simple constructor for the instance of FileIO
@@ -23,10 +23,10 @@ public class FileIO{
            transactionFilePath: the string path of where the transactions file to be read from is
     output: none
     */
-    public FileIO (String userFilePath, String itemFilePath, String transacitonFilePath){
-        this.userFilePath = userFilePath;
-        this.itemFilePath = itemFilePath;
-        this.transactionFilePath = transacitonFilePath;
+    public static void setPaths (String userFilePath, String itemFilePath, String transactionFilePath){
+        FileIO.userFilePath = userFilePath;
+        FileIO.itemFilePath = itemFilePath;
+        FileIO.transactionFilePath = transactionFilePath;
     }
 
     public static ArrayList<String> dailyTransactionFile;
@@ -34,16 +34,15 @@ public class FileIO{
     public static ArrayList<String> availableItems;
 
     /*
-    Description: This program takes the lists from the main program as reference then reads in all
-    of the different files nessesary for the program, based on the file names given to the class
-    on creation
-    If this function detects a error in one of the descriptors within on of the files, it will pass
-    upon that item, write an error, and proceed with the rest of the file
-    Inputs: users: a refernced list of users, items: a referenced list of items, transactions: a referenced
-    list of the transactions 
+    Description: This function reads the mergedDailyTransaction file, currentUserAccounts file,
+    and the availableItems file.
+    The currentUserAccounts file is read into a list of user objects, and the availableItems
+    file is read into a list of item objects
+    input: users: a pointer to a user ArrayList
+           items: a pointer to an Item ArrayList
     Outputs: a return of true or false, based on whether or not the read was succsesful
     */
-    public boolean readFiles(ArrayList<user> users, ArrayList<Item> items, ArrayList<String> transactions){
+    public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items){
 
         return true;
     }
@@ -55,7 +54,7 @@ public class FileIO{
             items: a list of type items that contains all of the info on every item
     Outputs: true or false based on if all of the writes were succesful or not
     */
-    public boolean writeFiles(ArrayList<user> users, ArrayList<Item> items){
+    public static boolean writeFiles(ArrayList<user> users, ArrayList<Item> items){
         
         return true;
     }

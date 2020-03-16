@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 
 public class parser {
-    static ArrayList<String> currentUserAccounts;
-    static ArrayList<String> availableItems;
+    static ArrayList<user> currentUserAccounts = new ArrayList<user>();
+    static ArrayList<Item> availableItems = new ArrayList<Item>();
     static void addCredit(String transaction) {
+        /*
         String Username = transaction.substring(3, 18);
         String Credit = transaction.substring(23, 31);
         for (int i = 0; i < currentUserAccounts.size(); i++) {
@@ -13,6 +14,7 @@ public class parser {
                 break;
             }
         }
+        */
     }
     static void advertise() {
 
