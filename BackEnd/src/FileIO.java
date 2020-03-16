@@ -120,4 +120,8 @@ public class FileIO{
         return true;
     }
 
+    public static ArrayList<String> readFile(String filePath) {
+        
+    }
+
 }
