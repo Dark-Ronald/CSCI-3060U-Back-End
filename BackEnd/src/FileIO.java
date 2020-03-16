@@ -43,7 +43,7 @@ public class FileIO{
     list of the transactions 
     Outputs: a return of true or false, based on whether or not the read was succsesful
     */
-    public boolean readFiles(ArrayList<User> users, ArrayList<Item> items, ArrayList<String> transactions){
+    public boolean readFiles(ArrayList<user> users, ArrayList<Item> items, ArrayList<String> transactions){
 
         return true;
     }
@@ -55,7 +55,7 @@ public class FileIO{
             items: a list of type items that contains all of the info on every item
     Outputs: true or false based on if all of the writes were succesful or not
     */
-    public boolean writeFiles(ArrayList<User> users, ArrayList<Item> items){
+    public boolean writeFiles(ArrayList<user> users, ArrayList<Item> items){
         
         return true;
     }
