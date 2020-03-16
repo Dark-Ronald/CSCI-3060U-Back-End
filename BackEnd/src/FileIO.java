@@ -3,9 +3,6 @@ Description: This classes purpose is to handle all of the different File IO need
 program. This does things like read in all of the different flies, the users file, read items file
 
 This also handles printing out fatal errors like thrying to read in an unrecognized file
-
-input: on a creation of an instance of FileIO, it requires being passed the file paths
-that the program will read and write from
 */
 import java.util.ArrayList;
 import java.io.*;
@@ -17,7 +14,7 @@ public class FileIO{
     private static String transactionFilePath;
 
     /* 
-    Description: A simple constructor for the instance of FileIO
+    Description: Function to set the paths to each of the files
     input: userFilePath: the string path of where the users file to be read from is
            itemFilePath: the string path of where the items file to be read from is
            transactionFilePath: the string path of where the transactions file to be read from is
@@ -30,8 +27,6 @@ public class FileIO{
     }
 
     public static ArrayList<String> dailyTransactionFile;
-    public static ArrayList<String> currentUserAccounts;
-    public static ArrayList<String> availableItems;
 
     /*
     Description: This function reads the mergedDailyTransaction file, currentUserAccounts file,
