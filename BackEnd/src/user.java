@@ -1,8 +1,9 @@
 public class user {
-    userTypes userType;
-    String username;
-    double credit;
-
+    //userTypes userType;
+    private String userType;
+    private String username;
+    private double credit;
+    /*
     enum userTypes {
         ADMIN (0x0000),
         FULL_STANDARD (0x0001),
@@ -13,9 +14,10 @@ public class user {
             this.type = type;
         }
     }
-
+    */
     user(String username, String userType, String credit) {
         this.username = username;
+        /*
         if (userType.compareTo("AA") == 0) {
             this.userType = userTypes.ADMIN;
         }
@@ -28,6 +30,20 @@ public class user {
         else {
             this.userType = userTypes.SELL_STANDARD;
         }
+        */
+        this.userType = userType;
         this.credit = Double.valueOf(credit);
+    }
+
+    public double getCredit() {
+        return credit;
+    }
+
+    public void setCredit(double credit) {
+        this.credit = credit;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

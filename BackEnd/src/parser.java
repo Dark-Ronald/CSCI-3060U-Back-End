@@ -4,17 +4,14 @@ public class parser {
     static ArrayList<user> currentUserAccounts = new ArrayList<user>();
     static ArrayList<Item> availableItems = new ArrayList<Item>();
     static void addCredit(String transaction) {
-        /*
-        String Username = transaction.substring(3, 18);
-        String Credit = transaction.substring(23, 31);
-        for (int i = 0; i < currentUserAccounts.size(); i++) {
-            String userAccount = currentUserAccounts.get(i);
-            if (Username.compareTo(userAccount.substring(3, 18)) == 0) {
-                currentUserAccounts.add(i, userAccount.substring(0, 22).concat(Credit));
+        String username = transaction.substring(3, 18);
+        double credit = Double.valueOf(transaction.substring(23, 31));
+        for (user userAccount : currentUserAccounts) {
+            if (username.compareTo(userAccount.getUsername()) == 0) {
+                userAccount.setCredit(credit);
                 break;
             }
         }
-        */
     }
     static void advertise() {
 
