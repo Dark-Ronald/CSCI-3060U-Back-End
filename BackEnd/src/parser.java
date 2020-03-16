@@ -1,8 +1,10 @@
 import java.util.ArrayList;
+import java.util.Date;
 
 public class parser {
     static ArrayList<user> currentUserAccounts = new ArrayList<user>();
     static ArrayList<Item> availableItems = new ArrayList<Item>();
+    static Date datePreviouslyRun;
 
     static void addCredit(String transaction) {
         String username = transaction.substring(3, 18);

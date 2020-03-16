@@ -23,10 +23,6 @@ public class main {
 
     }
 
-    public void wakeUp() {
-
-    }
-
     public void checkPreviousDaysFile() {
 
     }

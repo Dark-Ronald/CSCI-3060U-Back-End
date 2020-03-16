@@ -70,9 +70,38 @@ public class FileIO{
             while ((line = dailyTransactionFileReader.readLine()) != null) {
                 dailyTransactionFile.add(line);
             }
+            dailyTransactionFileReader.close();
         }
         catch (java.io.IOException e) {
             System.out.println("ERROR: IOException When Reading From File: " + dailyTransactionFile);
+            System.exit(-1);
+        }
+
+        try {
+            while ((line = currentUserAccountsReader.readLine()) != null) {
+                if (line.compareTo("END                         ") == 0) {
+                    break;
+                }
+                users.add(new user(line.substring(0, 14), line.substring(16, 17), line.substring(19, 27)));
+            }
+            currentUserAccountsReader.close();
+        }
+        catch (java.io.IOException e) {
+            System.out.println("ERROR: IOException When Reading From File: " + usersFilePath);
+            System.exit(-1);
+        }
+
+        try {
+            while ((line = availableItemsReader.readLine()) != null) {
+                if (line.compareTo("END                                                           ") == 0) {
+                    break;
+                }
+                items.add(new Item(line.substring(0, 18), line.substring(20, 34), line.substring(36, 50), line.substring(52, 54), line.substring(56, 61)));
+            }
+            availableItemsReader.close();
+        }
+        catch (java.io.IOException e) {
+            System.out.println("ERROR: IOException When Reading From File: " + itemsFilePath);
             System.exit(-1);
         }
 

@@ -19,12 +19,12 @@ public class Item {
            currently is, remainingDays: the amount of days before the bidding period ends 
     Output: none
     */
-    public Item(String itemName, String sellerName, String highestBidderName, short remainingDays, double bidPrice){
+    public Item(String itemName, String sellerName, String highestBidderName, String remainingDays, String bidPrice){
         this.itemName = itemName;
         this.sellerName = sellerName;
         this.highestBidderName = highestBidderName;
-        this.bidPrice = bidPrice;
-        this.remaningDays = remainingDays;
+        this.bidPrice = Double.valueOf(bidPrice);
+        this.remaningDays = Short.valueOf(remainingDays);
     }
 
     /*
