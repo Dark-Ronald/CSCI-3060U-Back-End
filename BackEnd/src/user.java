@@ -1,3 +1,6 @@
+/*
+class to represent a user of the auction system
+ */
 public class user {
     //userTypes userType;
     private String userType;
@@ -15,6 +18,14 @@ public class user {
         }
     }
     */
+
+    /*
+    user constructor
+    input: username: the username of the user
+           userType: the type of the user
+           credit: the credit of the user
+    output: this
+     */
     user(String username, String userType, String credit) {
         this.username = username;
         /*
@@ -35,14 +46,29 @@ public class user {
         this.credit = Double.valueOf(credit);
     }
 
+    /*
+    get the credit of the user
+    input: None
+    output: credit: the credit of the user
+     */
     public double getCredit() {
         return credit;
     }
 
+    /*
+    set the credit of the user
+    input: credit: the credit amount to set the users credit to
+    output: None
+     */
     public void setCredit(double credit) {
         this.credit = credit;
     }
 
+    /*
+    get the username of the user
+    input: None
+    output: username: the username of the user
+     */
     public String getUsername() {
         return username;
     }
