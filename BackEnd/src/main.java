@@ -13,12 +13,29 @@ public class main {
                 //TODO
                 //process line by calling parser function corresponding to transaction code
 
-
             }
+
+            FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
 
             //TODO
             //sleep until midnight of current day
         }
+
+    }
+
+    public void wakeUp() {
+
+    }
+
+    public void checkPreviousDaysFile() {
+
+    }
+
+    public void processDailyTransacionFile() {
+
+    }
+
+    public void sleep() {
 
     }
 }

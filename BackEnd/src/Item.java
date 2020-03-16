@@ -8,7 +8,7 @@ public class Item {
 
     private String itemName;
     private String sellerName;
-    private String buyerName;
+    private String highestBidderName;
     private double bidPrice;
     private short remaningDays; 
 
@@ -19,10 +19,10 @@ public class Item {
            currently is, remainingDays: the amount of days before the bidding period ends 
     Output: none
     */
-    public Item(String itemName, String sellerName, String buyerName, short remainingDays, double bidPrice){
+    public Item(String itemName, String sellerName, String highestBidderName, short remainingDays, double bidPrice){
         this.itemName = itemName;
         this.sellerName = sellerName;
-        this.buyerName = buyerName;
+        this.highestBidderName = highestBidderName;
         this.bidPrice = bidPrice;
         this.remaningDays = remainingDays;
     }
@@ -50,8 +50,8 @@ public class Item {
     input: none
     output: the current item name 
      */
-    public String getBuyerName() {
-        return buyerName;
+    public String getBidderName() {
+        return highestBidderName;
     }
 
     /*
@@ -95,8 +95,8 @@ public class Item {
     input: the new highest bidder
     output: none 
      */
-    public void setBuyerName(String buyerName) {
-        this.buyerName = buyerName;
+    public void setBidderName(String bidderName) {
+        this.highestBidderName = bidderName;
     }
 
     /*

@@ -9,9 +9,10 @@ import java.io.*;
 
 public class FileIO{
 
-    private static String userFilePath;
-    private static String itemFilePath;
+    private static String usersFilePath;
+    private static String itemsFilePath;
     private static String transactionFilePath;
+    public static ArrayList<String> dailyTransactionFile;
 
     /* 
     Description: Function to set the paths to each of the files
@@ -21,12 +22,10 @@ public class FileIO{
     output: none
     */
     public static void setPaths (String userFilePath, String itemFilePath, String transactionFilePath){
-        FileIO.userFilePath = userFilePath;
-        FileIO.itemFilePath = itemFilePath;
+        FileIO.usersFilePath = userFilePath;
+        FileIO.itemsFilePath = itemFilePath;
         FileIO.transactionFilePath = transactionFilePath;
     }
-
-    public static ArrayList<String> dailyTransactionFile;
 
     /*
     Description: This function reads the mergedDailyTransaction file, currentUserAccounts file,
@@ -38,6 +37,44 @@ public class FileIO{
     Outputs: a return of true or false, based on whether or not the read was succsesful
     */
     public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items){
+        BufferedReader dailyTransactionFileReader = null;
+        BufferedReader currentUserAccountsReader = null;
+        BufferedReader availableItemsReader = null;
+
+        try {
+            dailyTransactionFileReader = new BufferedReader(new FileReader(transactionFilePath));
+        }
+        catch(java.io.FileNotFoundException e) {
+            System.out.println("ERROR: FileNotFoundException. File: " + transactionFilePath + " Not Found");
+            System.exit(-1);
+        }
+
+        try {
+            currentUserAccountsReader = new BufferedReader(new FileReader(usersFilePath));
+        }
+        catch(java.io.FileNotFoundException e) {
+            System.out.println("ERROR: FileNotFoundException. File: " + usersFilePath + " Not Found");
+            System.exit(-1);
+        }
+
+        try {
+            availableItemsReader = new BufferedReader(new FileReader(itemsFilePath));
+        }
+        catch(java.io.FileNotFoundException e) {
+            System.out.println("ERROR: FileNotFoundException. File: " + itemsFilePath + " Not Found");
+            System.exit(-1);
+        }
+
+        String line;
+        try {
+            while ((line = dailyTransactionFileReader.readLine()) != null) {
+                dailyTransactionFile.add(line);
+            }
+        }
+        catch (java.io.IOException e) {
+            System.out.println("ERROR: IOException When Reading From File: " + dailyTransactionFile);
+            System.exit(-1);
+        }
 
         return true;
     }
