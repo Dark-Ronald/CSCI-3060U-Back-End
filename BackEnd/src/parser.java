@@ -26,7 +26,7 @@ public class parser {
         /*
         if user being deleted is the highest bidder on an item, then when they are deleted
         the second highest bidder needs to be found and replace the deleted user in the item
-        object
+        object.  This may involve reading previous dailyTransaction files
         */
     }
     static void refund() {
