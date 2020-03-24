@@ -17,7 +17,7 @@ public class parser {
      */
     static void addCredit(String transaction) {
         String username = transaction.substring(3, 18);
-        double credit = Double.valueOf(transaction.substring(23, 31));
+        double credit = Double.valueOf(transaction.substring(23, 32));
         for (user userAccount : currentUserAccounts) {
             if (username.compareTo(userAccount.getUsername()) == 0) {
                 userAccount.setCredit(credit);
@@ -32,7 +32,13 @@ public class parser {
     output: None
      */
     static void advertise(String transaction) {
+        String itemName = transaction.substring(3, 22);
+        String sellerName = transaction.substring(23, 36);
+        String daysToAuction = transaction.substring(37, 40);
+        String minBid = transaction.substring(41, 47);
+        String buyerName = "               ";
 
+        availableItems.add(new Item(itemName, sellerName, buyerName, daysToAuction, minBid));
     }
 
     /*
@@ -50,7 +56,11 @@ public class parser {
     output: None
      */
     static void create(String transaction) {
+        String username = transaction.substring(3, 18);
+        String userType = transaction.substring(19, 21);
+        String credit = transaction.substring(22, 31);
 
+        currentUserAccounts.add(new user(username, userType, credit));
     }
 
     /*
@@ -74,6 +84,31 @@ public class parser {
     output: None
      */
     static void refund(String transaction) {
+        String buyerName = transaction.substring(3, 18);
+        String sellerName = transaction.substring(19, 34);
+        double credit = Double.valueOf(transaction.substring(35, 43));
 
+        for (user buyerAccount : currentUserAccounts) {
+            if (buyerName.compareTo(buyerAccount.getUsername()) == 0) {
+                for (user sellerAccount : currentUserAccounts) {
+                    if (sellerName.compareTo(sellerAccount.getUsername()) == 0) {
+                        double buyerCredit = buyerAccount.getCredit();
+                        double sellerCredit = sellerAccount.getCredit();
+                        if (sellerCredit - credit < 0) {
+                            System.out.println("ERROR: Seller Doesn't Have Enough Credit For Refund.  Transaction: " + transaction);
+                            return;
+                        }
+                        else if (buyerCredit + credit > 999999) {
+                            System.out.println("ERROR: Refund Causes Buyers Credit To Exceed Maximum User Credit.  Transaction: " + transaction);
+                            return;
+                        }
+                        else {
+                            sellerAccount.setCredit(sellerCredit - credit);
+                            buyerAccount.setCredit(buyerCredit + credit);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

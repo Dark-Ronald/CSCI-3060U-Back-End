@@ -6,6 +6,9 @@ This also handles printing out fatal errors like thrying to read in an unrecogni
 */
 import java.util.ArrayList;
 import java.io.*;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.Comparator;
 
 public class FileIO{
 
@@ -13,6 +16,7 @@ public class FileIO{
     private static String itemsFilePath;
     private static String transactionFilePath;
     public static ArrayList<String> dailyTransactionFile;
+    private static ArrayList<Path> dTFList;
 
     /* 
     Description: Function to set the paths to each of the files
@@ -120,8 +124,62 @@ public class FileIO{
         return true;
     }
 
-    public static ArrayList<String> readFile(String filePath) {
-        
+    private static int dTFListI = 0;
+
+    public static ArrayList<String> getPreviousDTFs(boolean reset) {
+        if (reset) {
+            dTFListI = 0;
+        }
+        if (dTFListI >= dTFList.size()) {
+            return null;
+        }
+        ArrayList<String> file = new ArrayList<String>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(dTFList.get(dTFListI).toFile()));
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                file.add(line);
+            }
+            reader.close();
+        }
+        catch (java.io.FileNotFoundException e) {
+            System.out.println("ERROR: FileNotFoundException. File: " + dTFList.get(dTFListI).getFileName().toString() + " Not Found");
+            System.exit(-1);
+        }
+        catch (java.io.IOException e) {
+            System.out.println("ERROR: IOException When Reading From File: " + dTFList.get(dTFListI).getFileName().toString());
+            System.exit(-1);
+        }
+        dTFListI ++;
+        return file;
     }
 
+    static class pathComparator implements Comparator<Path> {
+        public int compare(Path p1, Path p2) {
+            return - p1.getFileName().toString().compareTo(p2.getFileName().toString());
+        }
+    }
+
+    private static void getDTFList() {
+        Path currentTransactionFilePath = Paths.get(transactionFilePath).toAbsolutePath();
+        Path transactionFilesDir = currentTransactionFilePath.getParent();
+        for (Path p : transactionFilesDir) {
+            if (p.compareTo(currentTransactionFilePath) == 0) {
+                continue;
+            }
+            String fileName = p.getFileName().toString();
+            int lI = fileName.lastIndexOf('.');
+            if ((lI != -1) && (fileName.length() - 1 != lI)) {
+                String extension = fileName.substring(lI);
+                if (extension.compareTo("atf") == 0) {
+                    dTFList.add(p);
+                }
+            }
+        }
+
+        dTFList.sort(new pathComparator());
+    }
 }
