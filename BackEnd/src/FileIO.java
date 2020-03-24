@@ -129,6 +129,7 @@ public class FileIO{
     public static ArrayList<String> getPreviousDTFs(boolean reset) {
         if (reset) {
             dTFListI = 0;
+            getDTFList();
         }
         if (dTFListI >= dTFList.size()) {
             return null;
