@@ -16,7 +16,7 @@ public class FileIO{
     private static String itemsFilePath;
     private static String transactionFilePath;
     public static ArrayList<String> dailyTransactionFile;
-    private static ArrayList<Path> dTFList;
+    private static ArrayList<Path> dTFList = new ArrayList<>();
 
     /* 
     Description: Function to set the paths to each of the files
@@ -147,6 +147,7 @@ public class FileIO{
     public static ArrayList<String> getPreviousDTFs(boolean reset) {
         if (reset) {
             dTFListI = 0;
+            dTFList = new ArrayList<>();
             getDTFList();
         }
         if (dTFListI >= dTFList.size()) {

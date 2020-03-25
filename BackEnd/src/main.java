@@ -9,14 +9,21 @@ Program is intended to be left running indefinitely, performing all functions at
 of everyday, or when it is signaled to wake, then returning to sleep
  */
 
+import java.util.ArrayList;
+
 public class main {
+
     /*
     main loop of program
-    input: String[] args: names of or paths to available_items, current_user_accounts, and
-                          daily_transaction files
+    input: String[] args: names of or paths to available_items and current_user_accounts files.
+                          Path to daily_transaction files.
     output: None
      */
     public static void main(String[] args) {
+        FileIO.setPaths(args[1], args[2], args[3]);
+
+
+
         while(true) {
             //TODO
             //wake up
@@ -26,11 +33,7 @@ public class main {
 
             FileIO.readFiles(parser.currentUserAccounts, parser.availableItems);
 
-            for (String line : FileIO.dailyTransactionFile) {
-                //TODO
-                //process line by calling parser function corresponding to transaction code
-
-            }
+            processDailyTransactionFile();
 
             FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
 
@@ -56,8 +59,32 @@ public class main {
     input: None
     output: None
      */
-    public void processDailyTransacionFile() {
-
+    public static void processDailyTransactionFile() {
+        for (String line : FileIO.dailyTransactionFile) {
+            //process line by calling parser function corresponding to transaction code
+            String code = line.substring(0, 2);
+            if (code.compareTo("01") == 0) {
+                parser.create(line);
+            }
+            else if (code.compareTo("02") == 0) {
+                parser.deleteUser(line);
+            }
+            else if (code.compareTo("03") == 0) {
+                parser.advertise(line);
+            }
+            else if (code.compareTo("04") == 0) {
+                parser.bid(line);
+            }
+            else if (code.compareTo("05") == 0) {
+                parser.refund(line);
+            }
+            else if (code.compareTo("06") == 0) {
+                parser.addCredit(line);
+            }
+            else if (code.compareTo("00") != 0) {
+                System.out.println("ERROR: Invalid Transaction Code.  Transaction: " + line);
+            }
+        }
     }
 
     /*
