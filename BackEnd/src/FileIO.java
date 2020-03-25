@@ -40,10 +40,10 @@ public class FileIO{
            items: a pointer to an Item ArrayList
     Outputs: a return of true or false, based on whether or not the read was succsesful
     */
-    public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items){
+    public static void readFiles(ArrayList<user> users, ArrayList<Item> items){
         BufferedReader dailyTransactionFileReader = null;
         BufferedReader currentUserAccountsReader = null;
-        BufferedReader availableItemsReader = null;
+        String line;
 
         try {
             dailyTransactionFileReader = new BufferedReader(new FileReader(transactionFilePath));
@@ -62,16 +62,29 @@ public class FileIO{
         }
 
         try {
-            availableItemsReader = new BufferedReader(new FileReader(itemsFilePath));
+            BufferedReader availableItemsReader = new BufferedReader(new FileReader(itemsFilePath));
+
+            while ((line = availableItemsReader.readLine()) != null) {
+                if (line.compareTo("END                                                           ") == 0) {
+                    break;
+                }
+                items.add(new Item(line.substring(0, 18), line.substring(20, 34), line.substring(36, 50), line.substring(52, 54), line.substring(56, 61)));
+            }
+            availableItemsReader.close();
         }
         catch(java.io.FileNotFoundException e) {
-            System.out.println("ERROR: FileNotFoundException. File: " + itemsFilePath + " Not Found");
+            //assume that lack of an items file means that this is the first time the backend is running
+        }
+        catch (java.io.IOException e) {
+            System.out.println("ERROR: IOException When Reading From File: " + itemsFilePath);
             System.exit(-1);
         }
 
-        String line;
         try {
             while ((line = dailyTransactionFileReader.readLine()) != null) {
+                if (line.compareTo("00") == 0) {
+                    break;
+                }
                 dailyTransactionFile.add(line);
             }
             dailyTransactionFileReader.close();
@@ -94,22 +107,6 @@ public class FileIO{
             System.out.println("ERROR: IOException When Reading From File: " + usersFilePath);
             System.exit(-1);
         }
-
-        try {
-            while ((line = availableItemsReader.readLine()) != null) {
-                if (line.compareTo("END                                                           ") == 0) {
-                    break;
-                }
-                items.add(new Item(line.substring(0, 18), line.substring(20, 34), line.substring(36, 50), line.substring(52, 54), line.substring(56, 61)));
-            }
-            availableItemsReader.close();
-        }
-        catch (java.io.IOException e) {
-            System.out.println("ERROR: IOException When Reading From File: " + itemsFilePath);
-            System.exit(-1);
-        }
-
-        return true;
     }
 
     /*
@@ -119,9 +116,30 @@ public class FileIO{
             items: a list of type items that contains all of the info on every item
     Outputs: true or false based on if all of the writes were succesful or not
     */
-    public static boolean writeFiles(ArrayList<user> users, ArrayList<Item> items){
-        
-        return true;
+    public static void writeFiles(ArrayList<user> users, ArrayList<Item> items){
+        String filePath = usersFilePath;
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(usersFilePath));
+            for (user user : users) {
+                writer.write(user.getUsername() + " " + user.getUserType() + " " + String.format("%.2f", user.getCredit()));
+                writer.newLine();
+            }
+            writer.write("END                         ");
+            writer.close();
+
+            filePath = itemsFilePath;
+            writer = new BufferedWriter(new FileWriter(itemsFilePath));
+            for (Item item : items) {
+                writer.write(item.getItemName() + " " + item.getSellerName() + " " + item.getBidderName() + " " + String.valueOf(item.getRemaningDays()) + " " + String.format("%.2f", item.getBidPrice()));
+                writer.newLine();
+            }
+            writer.write("END                                                           ");
+            writer.close();
+        }
+        catch (java.io.IOException e) {
+            System.out.println("ERROR: IOException When Writing To File: " + filePath);
+            System.exit(-1);
+        }
     }
 
     private static int dTFListI = 0;

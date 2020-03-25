@@ -72,4 +72,8 @@ public class user {
     public String getUsername() {
         return username;
     }
+
+    public String getUserType() {
+        return userType;
+    }
 }
