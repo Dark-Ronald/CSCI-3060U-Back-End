@@ -4,6 +4,7 @@ each item class, user the simple getter and setter methods, as well as the toStr
 functionallity
 Input: All of the different information nessesary for a single item
 */
+package classes;
 public class Item {
 
     private String itemName;
