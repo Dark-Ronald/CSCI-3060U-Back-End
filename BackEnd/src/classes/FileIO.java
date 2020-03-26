@@ -4,6 +4,8 @@ program. This does things like read in all of the different flies, the users fil
 
 This also handles printing out fatal errors like thrying to read in an unrecognized file
 */
+package classes;
+
 import java.util.ArrayList;
 import java.io.*;
 import java.nio.file.Paths;

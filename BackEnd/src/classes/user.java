@@ -1,6 +1,8 @@
 /*
 class to represent a user of the auction system
  */
+package classes;
+
 public class user {
     //userTypes userType;
     private String userType;
