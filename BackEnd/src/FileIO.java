@@ -4,6 +4,7 @@ program. This does things like read in all of the different flies, the users fil
 
 This also handles printing out fatal errors like thrying to read in an unrecognized file
 */
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.io.*;
 import java.nio.file.Paths;
@@ -15,8 +16,10 @@ public class FileIO{
     private static String usersFilePath;
     private static String itemsFilePath;
     private static String transactionFilePath;
+    private static Path currentTransactionFilePath = null;
     public static ArrayList<String> dailyTransactionFile;
     private static ArrayList<Path> dTFList = new ArrayList<>();
+    private static int linesRead;
 
     /* 
     Description: Function to set the paths to each of the files
@@ -40,16 +43,20 @@ public class FileIO{
            items: a pointer to an Item ArrayList
     Outputs: a return of true or false, based on whether or not the read was succsesful
     */
-    public static void readFiles(ArrayList<user> users, ArrayList<Item> items){
+    public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items){
+        readMeta();
+        if (!getDTFList()) {
+            return false;
+        }
         BufferedReader dailyTransactionFileReader = null;
         BufferedReader currentUserAccountsReader = null;
         String line;
 
         try {
-            dailyTransactionFileReader = new BufferedReader(new FileReader(transactionFilePath));
+            dailyTransactionFileReader = new BufferedReader(new FileReader(currentTransactionFilePath.toFile()));
         }
         catch(java.io.FileNotFoundException e) {
-            System.out.println("ERROR: FileNotFoundException. File: " + transactionFilePath + " Not Found");
+            System.out.println("ERROR: FileNotFoundException. File: " + currentTransactionFilePath.getFileName().toString() + " Not Found");
             System.exit(-1);
         }
 
@@ -81,13 +88,21 @@ public class FileIO{
         }
 
         try {
+            linesRead = 0;
             while ((line = dailyTransactionFileReader.readLine()) != null) {
                 if (line.compareTo("00") == 0) {
                     break;
                 }
-                dailyTransactionFile.add(line);
+                if (linesRead >= lineLeftAt) {
+                    dailyTransactionFile.add(line);
+                }
+                linesRead++;
             }
             dailyTransactionFileReader.close();
+            if (linesRead == lineLeftAt) {
+                currentUserAccountsReader.close();
+                return false; //stop processing of current file if it hasnt changed since it was last processed
+            }
         }
         catch (java.io.IOException e) {
             System.out.println("ERROR: IOException When Reading From File: " + dailyTransactionFile);
@@ -107,6 +122,7 @@ public class FileIO{
             System.out.println("ERROR: IOException When Reading From File: " + usersFilePath);
             System.exit(-1);
         }
+        return true;
     }
 
     /*
@@ -140,13 +156,16 @@ public class FileIO{
             System.out.println("ERROR: IOException When Writing To File: " + filePath);
             System.exit(-1);
         }
+
+        updateMeta();
     }
 
     private static int dTFListI = 0;
+    private static int dTFListIDefault = 0;
 
     public static ArrayList<String> getPreviousDTFs(boolean reset) {
         if (reset) {
-            dTFListI = 0;
+            dTFListI = dTFListIDefault;
             dTFList = new ArrayList<>();
             getDTFList();
         }
@@ -183,12 +202,15 @@ public class FileIO{
         }
     }
 
-    private static void getDTFList() {
-        Path currentTransactionFilePath = Paths.get(transactionFilePath).toAbsolutePath();
-        Path transactionFilesDir = currentTransactionFilePath.getParent();
+    /*
+    returns false if there are no daily transaction files in transactionFilePath
+     */
+    private static boolean getDTFList() {
+        Path transactionFilesDir = Paths.get(transactionFilePath).toAbsolutePath();
+        int i = 0;
         for (Path p : transactionFilesDir) {
             if (p.compareTo(currentTransactionFilePath) == 0) {
-                continue;
+                dTFListI = i;
             }
             String fileName = p.getFileName().toString();
             int lI = fileName.lastIndexOf('.');
@@ -198,8 +220,67 @@ public class FileIO{
                     dTFList.add(p);
                 }
             }
+            i++;
+        }
+
+        if (dTFList.size() == 0) {
+            return false;
         }
 
         dTFList.sort(new pathComparator());
+        if (currentTransactionFilePath == null) {
+            currentTransactionFilePath = dTFList.get(0);
+        }
+        return true;
+    }
+
+    /*
+    by default the transaction file to be processed is the most recent one, but at midnight the
+    previous days transaction file must be processed
+
+    public static void setTransactionFileToPreviousDays() {
+        String date = main.today.toString() + ".atf";
+        int i = 0;
+        for (Path p : dTFList) {
+            if (p.getFileName().toString().compareTo(date) < 0) {
+                dTFListIDefault = i;
+                dTFListI = i;
+                currentTransactionFilePath = p;
+                return;
+            }
+            i++;
+        }
+    }
+    */
+    private static int lineLeftAt;
+
+    private static void updateMeta() {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("meta.inf"));
+            if (!main.newDay) {
+                writer.write(currentTransactionFilePath.getFileName().toString());
+                writer.newLine();
+                writer.write(linesRead + lineLeftAt);
+            }
+            writer.close();
+        }
+        catch (java.io.IOException e) {
+            System.exit(-1);
+        }
+    }
+
+    private static void readMeta() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("meta.inf"));
+            currentTransactionFilePath = Paths.get(reader.readLine()).toAbsolutePath();
+            lineLeftAt = Integer.valueOf(reader.readLine());
+        }
+        catch (java.io.FileNotFoundException e) {
+            currentTransactionFilePath = null;
+            lineLeftAt = 0;
+        }
+        catch (java.io.IOException e) {
+            System.exit(-1);
+        }
     }
 }
