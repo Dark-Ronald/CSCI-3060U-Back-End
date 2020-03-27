@@ -46,7 +46,7 @@ public class main {
             if (today.compareTo(LocalDate.now()) != 0) {
                 newDay = true;
                 today = LocalDate.now();
-                FileIO.setTransactionFileToPreviousDays();
+                //FileIO.setTransactionFileToPreviousDays();
             }
 
             //TODO
