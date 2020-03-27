@@ -165,7 +165,7 @@ public class Item {
             }
 
         }
-        // Using the uniqueBidList, merge with the available items array
+        //Merge the uniqueBidList array with the available items array
         for (int z = 0; z < uniqueBidList.size(); z++){
             for (int k = 0; k < availableItems.size(); k++){
                 if (uniqueBidList[z].getItemName().compareTo(availableItems[k].getItemName()) == 0 && uniqueBidList[z].getSellerName().compareTo(availableItems[k].getSellerName()) == 0){
