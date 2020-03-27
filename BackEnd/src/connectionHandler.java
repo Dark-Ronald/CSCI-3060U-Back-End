@@ -20,6 +20,20 @@ public class connectionHandler {
         cHT = new Thread(cHI);
         cHT.start();
     }
+
+    public static void shutdown() {
+        cHI.shutdown();
+        try {
+            cHT.join();
+        }
+        catch (java.lang.InterruptedException e) {
+            //do nothing
+        }
+    }
+
+    public static void signalFrontEnds() {
+        cHI.signalFrontEnds();
+    }
 }
 
 /*
@@ -29,28 +43,42 @@ interaction between other classes can be done through connectionHandler
  */
 class connectionHandlerInst implements Runnable {
     private static AtomicBoolean shutdown;
+    private static ArrayList<clientConnectionHandler> connections;
 
     connectionHandlerInst() {
         shutdown.set(false);
     }
 
     public void run() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(8080);
-            serverSocket.setSoTimeout(1000);
-            while (!shutdown.get()) {
-                try {
-                    Socket clientSocket = serverSocket.accept();
-                    clientConnectionHandler handler = new clientConnectionHandler(clientSocket);
+        while (!shutdown.get()) {
+            try {
+                ServerSocket serverSocket = new ServerSocket(8080);
+                serverSocket.setSoTimeout(1000);
+                while (!shutdown.get()) {
+                    try {
+                        Socket clientSocket = serverSocket.accept();
+                        connections.add(new clientConnectionHandler(clientSocket));
 
+                    } catch (java.net.SocketTimeoutException e) {
+                        continue;
+                    }
                 }
-                catch (java.net.SocketTimeoutException e) {
-                    continue;
-                }
+            } catch (java.io.IOException e) {
+                //do nothing
             }
         }
-        catch (java.io.IOException e) {
-            System.exit(0);
+    }
+
+    public void shutdown() {
+        shutdown.set(true);
+        for (clientConnectionHandler connection : connections) {
+            connection.shutdown();
+        }
+    }
+
+    public void signalFrontEnds() {
+        for (clientConnectionHandler connection : connections) {
+            connection.sendSignal();
         }
     }
 }
@@ -58,14 +86,33 @@ class connectionHandlerInst implements Runnable {
 class clientConnectionHandler {
     Thread readerT;
     Thread writerT;
+    connectionReader reader;
+    connectionWriter writer;
+
     clientConnectionHandler(Socket socket) {
-        connectionReader reader = new connectionReader(socket);
+        reader = new connectionReader(socket);
         readerT = new Thread(reader);
         readerT.start();
 
-        connectionWriter writer = new connectionWriter(socket);
+        writer = new connectionWriter(socket);
         writerT = new Thread(writer);
         writerT.start();
+    }
+
+    public void shutdown() {
+        reader.shutdown();
+        writer.shutdown();
+        try {
+            readerT.join();
+            writerT.join();
+        }
+        catch (java.lang.InterruptedException e) {
+            //do nothing
+        }
+    }
+
+    public void sendSignal() {
+        writer.sendSignal();
     }
 }
 
@@ -75,33 +122,87 @@ class connectionReader implements Runnable {
 
     connectionReader(Socket socket) {
         clientSocket = socket;
+        shutdown.set(false);
     }
 
     public void run() {
         try {
             InputStreamReader reader = new InputStreamReader(clientSocket.getInputStream());
-
+            boolean update = false;
+            while (!shutdown.get()) {
+                /*
+                get the most recent request for an update, and ignore the rest
+                 */
+                while (reader.ready()) {
+                    if (shutdown.get()) {
+                        break;
+                    }
+                    /*
+                    data is being used as a signal, so it doesnt matter what the data is
+                     */
+                    reader.read();
+                    update = true;
+                }
+                if (update) {
+                    update = false;
+                    /*
+                    wakeup is only processed when the program is idle, so if it is currently
+                    running then it will finish its current execution
+                     */
+                    main.wakeup.set(true);
+                }
+            }
         }
         catch (IOException e) {
-
+            //will end up here if connection is closed, so do nothing
         }
+    }
+
+    public void shutdown() {
+        shutdown.set(true);
     }
 }
 
 class connectionWriter implements Runnable {
     Socket clientSocket;
+    private AtomicBoolean shutdown;
+    private AtomicBoolean shutdownOrSignal; //only used for signals, value never set, exists for clarity
 
     connectionWriter(Socket socket) {
         clientSocket = socket;
+        shutdown.set(false);
     }
 
     public void run() {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(clientSocket.getOutputStream());
 
+            while (!shutdown.get()) {
+                try {
+                    shutdownOrSignal.wait();
+                    if (!shutdown.get()) {
+                        /*
+                        data is used as a signal, so what is written doesnt matter
+                         */
+                        writer.write(49);
+                    }
+                }
+                catch (java.lang.InterruptedException e) {
+                    //do nothing
+                }
+            }
         }
         catch (IOException e) {
 
         }
+    }
+
+    public void shutdown() {
+        shutdown.set(true);
+        shutdownOrSignal.notify();
+    }
+
+    public void sendSignal() {
+        shutdownOrSignal.notify();
     }
 }

@@ -10,8 +10,10 @@ of everyday, or when it is signaled to wake, then returning to sleep
  */
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class main {
+    public static AtomicBoolean wakeup;
 
     /*
     main loop of program
