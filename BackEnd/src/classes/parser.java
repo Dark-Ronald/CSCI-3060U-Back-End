@@ -10,6 +10,7 @@ utility class for parsing the lines of the daily_transaction file
 public class parser {
     static ArrayList<user> currentUserAccounts = new ArrayList<user>();
     static ArrayList<Item> availableItems = new ArrayList<Item>();
+    static ArrayList<Item> bidList = new ArrayList<Item>();
     static Date datePreviouslyRun;
 
     /*
@@ -50,6 +51,14 @@ public class parser {
     output: None
      */
     static void bid(String transaction) {
+        String itemName = transaction.substring(3, 22);
+        String sellerName = transaction.substring(23, 36);
+        String bidderName = transaction.substring(37, 50);
+        String daysToAuction = "0"; // filler
+        String bidderBid = transaction.substring(51,56);
+
+        //Collect all bids to be processed later, check later if the auction part of item array can be null
+        bidList.add(new Item(itemName, sellerName, bidderName, daysToAuction ,bidderBid));
 
     }
 

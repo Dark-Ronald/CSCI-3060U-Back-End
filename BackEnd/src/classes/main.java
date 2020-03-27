@@ -55,7 +55,7 @@ public class main {
             if (FileIO.readFiles(parser.currentUserAccounts, parser.availableItems)) {
 
                 processDailyTransactionFile();
-
+                Item.bid(parser.bidList, parser.availableItems);
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
             }
 

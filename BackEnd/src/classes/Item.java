@@ -5,13 +5,17 @@ functionallity
 Input: All of the different information nessesary for a single item
 */
 package classes;
+
+import java.util.ArrayList;
+
 public class Item {
 
     private String itemName;
     private String sellerName;
     private String highestBidderName;
     private double bidPrice;
-    private short remaningDays; 
+    private short remaningDays;
+    static ArrayList<Item> uniqueBidList = new ArrayList<Item>();
 
     /*
     Description: A simple constructor for the class, storing all of the nessesary information
@@ -127,5 +131,48 @@ public class Item {
     @Override
     public String toString() {
         return "item description";
+    }
+
+
+    /* 
+    Description: Handles the bidding and modifies the available items array
+    input: bidList array, available item array
+    output: none
+    */
+    public void bid(ArrayList<Item> bidList, ArrayList<Item> availableItems){
+        // Create an array of unique bids to compare bids
+
+        //Loop through every bid from daily transaction file
+        for (int i = 0; i < bidList.size(); i++){
+            //Loop through the uniqueBidList
+            for (int j = 0; j < uniqueBidList.size(); j++){
+                // If both compareTo's are equal to zero then that means there has been a match
+                // and bid is not unique so we have to compare bids and take the highest bid
+                if (bidList[i].getItemName().compareTo(uniqueBidList[j]) == 0 && bidList[i].getSellerName().compareTo(uniqueBidList[j]) == 0){
+                    //compare the bids, need to convert both bids to double to compare
+                    double compareBidList = 0.0;
+                    double compareUniqueBidList = 0.0;
+
+                    compareBidList = ((bidList[i].getBidPrice());
+                    compareUniqueBidList = (uniqueBidList[i].getBidPrice());
+                    if (compareBidList > compareUniqueBidList){
+                        uniqueBidList[j].setBidPrice(bidList[i].getBidPrice());
+                    }
+                // otherwise it's unique so we add it to uniqueBidList array
+                } else {
+                    uniqueBidList.add(new Item(bidList[i].getItemName(), bidList[i].getSellerName(), bidList[i].getBidderName(), 0, bidList[i].getBidPrice()));
+                }
+            }
+
+        }
+        // Using the uniqueBidList, merge with the available items array
+        for (int z = 0; z < uniqueBidList.size(); z++){
+            for (int k = 0; k < availableItems.size(); k++){
+                if (uniqueBidList[z].getItemName().compareTo(availableItems[k].getItemName()) == 0 && uniqueBidList[z].getSellerName().compareTo(availableItems[k].getSellerName()) == 0){
+                    availableItems[k].setBidderName(uniqueBidList[z].getBidderName());
+                    availableItems[k].setBidPrice(uniqueBidList[z].getBidderName());
+                }
+            }
+        }
     }
 }
