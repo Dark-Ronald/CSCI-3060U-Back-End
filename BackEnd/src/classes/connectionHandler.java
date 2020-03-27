@@ -151,7 +151,7 @@ class connectionReader implements Runnable {
                     wakeup is only processed when the program is idle, so if it is currently
                     running then it will finish its current execution
                      */
-                    main.wakeup.set(true);
+                    main.wakeup.notify();
                 }
             }
         }

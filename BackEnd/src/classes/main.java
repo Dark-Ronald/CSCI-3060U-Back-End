@@ -12,10 +12,14 @@ package classes;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.sql.Time;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.MONTH;
+import static java.util.Calendar.YEAR;
 
 public class main {
     public static AtomicBoolean wakeup;
@@ -28,7 +32,7 @@ public class main {
                           Path to daily_transaction files.
     output: None
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws java.lang.InterruptedException {
         //TODO
         //if no paths given for files then assume they are in the current working directory
 
@@ -37,20 +41,29 @@ public class main {
         shutdown.set(false);
         wakeup.set(false);
 
+        Thread userInput = new Thread(new getUserInput());
+        userInput.start();
+
         connectionHandler.init();
+        midnightTask task = new midnightTask();
+        Timer midnightTimer = new Timer();
+        GregorianCalendar midnightTime = new GregorianCalendar();
+        midnightTime.set(
+                midnightTime.get(YEAR),
+                midnightTime.get(MONTH),
+                midnightTime.get(DAY_OF_MONTH) + 1,
+                0,
+                0,
+                0
+        );
+        midnightTimer.schedule(task, midnightTime.getTime());
 
         while(!shutdown.get()) {
-            //TODO
-            //wake up
-
             if (today.compareTo(LocalDate.now()) != 0) {
                 newDay = true;
                 today = LocalDate.now();
                 //FileIO.setTransactionFileToPreviousDays();
             }
-
-            //TODO
-            //check for previous days file
 
             if (FileIO.readFiles(parser.currentUserAccounts, parser.availableItems)) {
 
@@ -63,7 +76,11 @@ public class main {
 
             //TODO
             //sleep until midnight of current day
+
+            wakeup.wait();
         }
+        midnightTimer.cancel();
+        userInput.join();
         connectionHandler.shutdown();
     }
 
@@ -72,10 +89,11 @@ public class main {
     waits until it is created
     input: None
     output: None
-     */
+
     public void checkPreviousDaysFile() {
 
     }
+    */
 
     /*
     Processes the daily_transaction file by calling respective parser function for each
@@ -136,5 +154,13 @@ class getUserInput implements Runnable{
 
         //shutdown whether shutdown command received or an exception occurred
         main.shutdown.set(true);
+    }
+}
+
+class midnightTask extends TimerTask implements Runnable {
+
+    public void run() {
+        
+        main.wakeup.notify();
     }
 }
