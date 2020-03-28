@@ -7,6 +7,7 @@ Input: All of the different information nessesary for a single item
 package classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Item {
 
@@ -148,31 +149,38 @@ public class Item {
             for (int j = 0; j < uniqueBidList.size(); j++){
                 // If both compareTo's are equal to zero then that means there has been a match
                 // and bid is not unique so we have to compare bids and take the highest bid
-                if (bidList[i].getItemName().compareTo(uniqueBidList[j]) == 0 && bidList[i].getSellerName().compareTo(uniqueBidList[j]) == 0){
+                Item[] bidArray = bidList.toArray(new Item[bidList.size()]);
+                Item[] uniqueArray = uniqueBidList.toArray(new Item[uniqueBidList.size()]);
+                if (bidArray[i].getItemName().compareTo(uniqueArray[j].getItemName()) == 0 && bidArray[i].getSellerName().compareTo(uniqueArray[j].getSellerName()) == 0){
                     //compare the bids, need to convert both bids to double to compare
                     double compareBidList = 0.0;
                     double compareUniqueBidList = 0.0;
 
-                    compareBidList = ((bidList[i].getBidPrice());
-                    compareUniqueBidList = (uniqueBidList[i].getBidPrice());
+                    compareBidList = ((bidArray[i].getBidPrice());
+                    compareUniqueBidList = (uniqueArray[i].getBidPrice());
                     if (compareBidList > compareUniqueBidList){
-                        uniqueBidList[j].setBidPrice(bidList[i].getBidPrice());
+                        uniqueArray[j].setBidPrice(bidArray[i].getBidPrice());
                     }
                 // otherwise it's unique so we add it to uniqueBidList array
                 } else {
-                    uniqueBidList.add(new Item(bidList[i].getItemName(), bidList[i].getSellerName(), bidList[i].getBidderName(), 0, bidList[i].getBidPrice()));
+                    String strBidPrice = Double.toString(bidArray[i].getBidPrice());
+                    uniqueBidList.add(new Item(bidArray[i].getItemName(), bidArray[i].getSellerName(), bidArray[i].getBidderName(), "0", strBidPrice));
                 }
             }
 
         }
         //Merge the uniqueBidList array with the available items array
+        Item[] completeUniqueArray = uniqueBidList.toArray(new Item[uniqueBidList.size()]);
+        Item[] availableItemsArray = availableItems.toArray(new Item[availableItems.size()]);
         for (int z = 0; z < uniqueBidList.size(); z++){
             for (int k = 0; k < availableItems.size(); k++){
-                if (uniqueBidList[z].getItemName().compareTo(availableItems[k].getItemName()) == 0 && uniqueBidList[z].getSellerName().compareTo(availableItems[k].getSellerName()) == 0){
-                    availableItems[k].setBidderName(uniqueBidList[z].getBidderName());
-                    availableItems[k].setBidPrice(uniqueBidList[z].getBidderName());
+                if (completeUniqueArray[z].getItemName().compareTo(availableItemsArray[k].getItemName()) == 0 && completeUniqueArray[z].getSellerName().compareTo(availableItemsArray[k].getSellerName()) == 0){
+                    availableItemsArray[k].setBidderName(completeUniqueArray[z].getBidderName());
+                    availableItemsArray[k].setBidPrice(completeUniqueArray[z].getBidPrice());
                 }
             }
         }
+        //Convert availableItemsArray back to a list
+        availableItems = Arrays.asList(availableItemsArray));
     }
 }
