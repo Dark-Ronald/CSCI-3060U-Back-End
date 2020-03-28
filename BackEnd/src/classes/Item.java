@@ -156,7 +156,7 @@ public class Item {
                     double compareBidList = 0.0;
                     double compareUniqueBidList = 0.0;
 
-                    compareBidList = ((bidArray[i].getBidPrice());
+                    compareBidList = (bidArray[i].getBidPrice());
                     compareUniqueBidList = (uniqueArray[i].getBidPrice());
                     if (compareBidList > compareUniqueBidList){
                         uniqueArray[j].setBidPrice(bidArray[i].getBidPrice());
@@ -181,6 +181,6 @@ public class Item {
             }
         }
         //Convert availableItemsArray back to a list
-        availableItems = Arrays.asList(availableItemsArray));
+        availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
     }
 }
