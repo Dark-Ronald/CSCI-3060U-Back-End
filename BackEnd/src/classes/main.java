@@ -12,6 +12,7 @@ package classes;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.sql.Array;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.util.*;
@@ -34,11 +35,11 @@ public class main {
     output: None
      */
     public static void main(String[] args) throws java.lang.InterruptedException {
-        String[] paths = new String[3];
-        for (int i = 0; i < args.length - 1; i++) {
-            paths[i] = args[i + 1];
+        String transactionFilesPath = null;
+        if (args.length == 4) {
+            transactionFilesPath = args[3];
         }
-        FileIO.setPaths(paths[1], paths[2], paths[3]);
+        FileIO.setPaths(args[1], args[2], transactionFilesPath);
 
         shutdown.set(false);
         wakeup.set(false);
@@ -51,14 +52,19 @@ public class main {
 
         while(!shutdown.get()) {
             boolean sleep = true;
+            boolean newDayFlag = false;
             if (FileIO.readFiles(parser.currentUserAccounts, parser.availableItems) && !newDay.get()) {
 
                 processDailyTransactionFile();
+                if (newDayFlag) {
+                    runAuctionDay(parser.currentUserAccounts, parser.availableItems);
+                }
 
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
             }
             else if (newDay.get() && !FileIO.fileComplete) {
                 newDay.set(false);
+                newDayFlag = true;
                 sleep = false;
                 shutdown.wait(300000); //wait 5 minutes for front ends to write out file
             }
@@ -127,6 +133,56 @@ public class main {
                 0
         );
         midnightTimer.schedule(task, midnightTime.getTime());
+    }
+
+    private static void runAuctionDay(ArrayList<user> currentUserAccounts, ArrayList<Item> availableItems) {
+        for (int i = 0; i < availableItems.size(); i++) {
+            Item item = availableItems.get(i);
+            if (item.getRemaningDays() == 0) {
+                if (item.getBidderName().compareTo("               ") != 0) {
+                    user seller = null;
+                    user buyer = null;
+                    for (user user : currentUserAccounts) {
+                        if (user.getUsername().compareTo(item.getBidderName()) == 0) {
+                            buyer = user;
+                        }
+                        if (user.getUsername().compareTo(item.getSellerName()) == 0) {
+                            seller = user;
+                        }
+
+                        if ((seller != null) && (buyer != null)) {
+                            break;
+                        }
+                    }
+                    boolean transactionGood = true;
+                    if (buyer.getCredit() < item.getBidPrice()) {
+                        System.out.println("ERROR: Bidder Does Not Have Sufficient Funds.  Item Listing: " +
+                                item.getItemName() + " " +
+                                item.getSellerName() + " " +
+                                item.getBidderName() + " " +
+                                String.valueOf(item.getRemaningDays()) + " " +
+                                String.format("%.2f", item.getBidPrice()));
+                        transactionGood = false;
+                    }
+                    if (seller.getCredit() + item.getBidPrice() > 999999.00) {
+                        System.out.println("ERROR: Item Purchase Causes Seller Credit To Exceed Maximum Credit Amount (999999.00).  Item Listing: " +
+                                item.getItemName() + " " +
+                                item.getSellerName() + " " +
+                                item.getBidderName() + " " +
+                                String.valueOf(item.getRemaningDays()) + " " +
+                                String.format("%.2f", item.getBidPrice()));
+                        transactionGood = false;
+                    }
+
+                    if (transactionGood) {
+                        buyer.setCredit(buyer.getCredit() - item.getBidPrice());
+                        seller.setCredit(seller.getCredit() + item.getBidPrice());
+                    }
+                }
+                availableItems.remove(i);
+                i--;
+            }
+        }
     }
 }
 

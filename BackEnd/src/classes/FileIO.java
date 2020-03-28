@@ -27,13 +27,18 @@ public class FileIO{
     Description: Function to set the paths to each of the files
     input: userFilePath: the string path of where the users file to be read from is
            itemFilePath: the string path of where the items file to be read from is
-           transactionFilePath: the string path of where the transactions file to be read from is
+           transactionFilePath: the string path of where the transactions files to be read from are
     output: none
     */
     public static void setPaths (String userFilePath, String itemFilePath, String transactionFilePath){
         FileIO.usersFilePath = userFilePath;
         FileIO.itemsFilePath = itemFilePath;
-        FileIO.transactionFilePath = transactionFilePath;
+        if (transactionFilePath == null) {
+            FileIO.transactionFilePath = ".";
+        }
+        else {
+            FileIO.transactionFilePath = transactionFilePath;
+        }
     }
 
     /*
