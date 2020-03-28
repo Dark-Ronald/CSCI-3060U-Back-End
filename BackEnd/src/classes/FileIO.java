@@ -34,7 +34,9 @@ public class FileIO{
         FileIO.usersFilePath = userFilePath;
         FileIO.itemsFilePath = itemFilePath;
         if (transactionFilePath == null) {
-            FileIO.transactionFilePath = ".";
+            //TODO
+            //set the correct default path?
+            FileIO.transactionFilePath = "";
         }
         else {
             FileIO.transactionFilePath = transactionFilePath;
@@ -57,6 +59,8 @@ public class FileIO{
         }
         BufferedReader dailyTransactionFileReader = null;
         BufferedReader currentUserAccountsReader = null;
+
+        dailyTransactionFile = new ArrayList<>();
         String line;
 
         try {
@@ -82,7 +86,7 @@ public class FileIO{
                 if (line.compareTo("END                                                           ") == 0) {
                     break;
                 }
-                items.add(new Item(line.substring(0, 18), line.substring(20, 34), line.substring(36, 50), line.substring(52, 54), line.substring(56, 61)));
+                items.add(new Item(line.substring(0, 19), line.substring(20, 35), line.substring(36, 51), line.substring(52, 55), line.substring(56, 62)));
             }
             availableItemsReader.close();
         }
@@ -124,7 +128,7 @@ public class FileIO{
                 if (line.compareTo("END                         ") == 0) {
                     break;
                 }
-                users.add(new user(line.substring(0, 14), line.substring(16, 17), line.substring(19, 27)));
+                users.add(new user(line.substring(0, 15), line.substring(16, 18), line.substring(19, 28)));
             }
             currentUserAccountsReader.close();
         }
@@ -147,7 +151,7 @@ public class FileIO{
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(usersFilePath));
             for (user user : users) {
-                writer.write(user.getUsername() + " " + user.getUserType() + " " + String.format("%.2f", user.getCredit()));
+                writer.write(user.getUsername() + " " + user.getUserType() + " " + pad(String.format("%.2f", user.getCredit()), '0', 9, true));
                 writer.newLine();
             }
             writer.write("END                         ");
@@ -156,7 +160,7 @@ public class FileIO{
             filePath = itemsFilePath;
             writer = new BufferedWriter(new FileWriter(itemsFilePath));
             for (Item item : items) {
-                writer.write(item.getItemName() + " " + item.getSellerName() + " " + item.getBidderName() + " " + String.valueOf(item.getRemaningDays()) + " " + String.format("%.2f", item.getBidPrice()));
+                writer.write(item.getItemName() + " " + item.getSellerName() + " " + item.getBidderName() + " " + pad(String.valueOf(item.getRemaningDays()), '0', 3, true) + " " + pad(String.format("%.2f", item.getBidPrice()), '0', 6, true));
                 writer.newLine();
             }
             writer.write("END                                                           ");
@@ -168,6 +172,16 @@ public class FileIO{
         }
 
         updateMeta();
+    }
+
+    //pads strings to conform to file formats.  side currently unused
+    private static String pad(String s, char c, int len, boolean side) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < len - s.length(); i++) {
+            sb.append(c);
+        }
+        sb.append(s);
+        return sb.toString();
     }
 
     private static int dTFListI = 0;
@@ -219,19 +233,20 @@ public class FileIO{
         Path transactionFilesDir = Paths.get(transactionFilePath).toAbsolutePath();
         int i = 0;
         dTFListIDefault = 0;
-        for (Path p : transactionFilesDir) {
-            if (p.compareTo(currentTransactionFilePath) == 0) {
+        for (File f : transactionFilesDir.toFile().listFiles()) {
+            Path p = f.toPath();
+            if ((currentTransactionFilePath != null) && (p.compareTo(currentTransactionFilePath) == 0)) {
                 dTFListIDefault = i;
             }
             String fileName = p.getFileName().toString();
             int lI = fileName.lastIndexOf('.');
             if ((lI != -1) && (fileName.length() - 1 != lI)) {
-                String extension = fileName.substring(lI);
+                String extension = fileName.substring(lI + 1);
                 if (extension.compareTo("atf") == 0) {
                     dTFList.add(p);
+                    i++;
                 }
             }
-            i++;
         }
 
         if (dTFList.size() == 0) {
@@ -272,7 +287,7 @@ public class FileIO{
             if (!fileComplete) {
                 writer.write(currentTransactionFilePath.getFileName().toString());
                 writer.newLine();
-                writer.write(linesRead + lineLeftAt);
+                writer.write(String.valueOf(linesRead + lineLeftAt));
             }
             else {
                 writer.write(dTFList.get(dTFListIDefault - 1).getFileName().toString());

@@ -44,8 +44,8 @@ created in any of the other classes, so this class is just used for an instance 
 interaction between other classes can be done through connectionHandler
  */
 class connectionHandlerInst implements Runnable {
-    private static AtomicBoolean shutdown;
-    private static ArrayList<clientConnectionHandler> connections;
+    private static AtomicBoolean shutdown = new AtomicBoolean();
+    private static ArrayList<clientConnectionHandler> connections = new ArrayList<>();
 
     connectionHandlerInst() {
         shutdown.set(false);
@@ -120,7 +120,7 @@ class clientConnectionHandler {
 
 class connectionReader implements Runnable {
     private Socket clientSocket;
-    private AtomicBoolean shutdown;
+    private AtomicBoolean shutdown = new AtomicBoolean();
 
     connectionReader(Socket socket) {
         clientSocket = socket;
@@ -151,7 +151,10 @@ class connectionReader implements Runnable {
                     wakeup is only processed when the program is idle, so if it is currently
                     running then it will finish its current execution
                      */
-                    main.wakeup.notify();
+                    synchronized (main.wakeup) {
+                        main.wakeup.set(true);
+                        main.wakeup.notify();
+                    }
                 }
             }
         }
@@ -167,8 +170,8 @@ class connectionReader implements Runnable {
 
 class connectionWriter implements Runnable {
     Socket clientSocket;
-    private AtomicBoolean shutdown;
-    private AtomicBoolean shutdownOrSignal; //only used for signals, value never set, exists for clarity
+    private AtomicBoolean shutdown = new AtomicBoolean();
+    private AtomicBoolean shutdownOrSignal = new AtomicBoolean(); //only used for signals, value never set, exists for clarity
 
     connectionWriter(Socket socket) {
         clientSocket = socket;

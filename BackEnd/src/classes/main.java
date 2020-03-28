@@ -23,11 +23,11 @@ import static java.util.Calendar.MONTH;
 import static java.util.Calendar.YEAR;
 
 public class main {
-    public static AtomicBoolean wakeup;
-    public static AtomicBoolean shutdown;
+    public static AtomicBoolean wakeup = new AtomicBoolean();
+    public static AtomicBoolean shutdown = new AtomicBoolean();
     public static midnightTask task = new midnightTask();
     public static Timer midnightTimer = new Timer();
-    public static AtomicBoolean newDay;
+    public static AtomicBoolean newDay = new AtomicBoolean();
     /*
     main loop of program
     input: String[] args: names of or paths to available_items and current_user_accounts files.
@@ -36,10 +36,10 @@ public class main {
      */
     public static void main(String[] args) throws java.lang.InterruptedException {
         String transactionFilesPath = null;
-        if (args.length == 4) {
-            transactionFilesPath = args[3];
+        if (args.length == 3) {
+            transactionFilesPath = args[2];
         }
-        FileIO.setPaths(args[1], args[2], transactionFilesPath);
+        FileIO.setPaths(args[0], args[1], transactionFilesPath);
 
         shutdown.set(false);
         wakeup.set(false);
@@ -61,15 +61,25 @@ public class main {
                 }
 
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
+                parser.clean();
             }
             else if (newDay.get() && !FileIO.fileComplete) {
                 newDay.set(false);
                 newDayFlag = true;
                 sleep = false;
-                shutdown.wait(300000); //wait 5 minutes for front ends to write out file
+                synchronized (shutdown) {
+                    while (!shutdown.get()) {
+                        shutdown.wait(300000); //wait 5 minutes for front ends to write out file
+                    }
+                }
             }
             if (sleep) {
-                wakeup.wait();
+                synchronized (wakeup) {
+                    while (!wakeup.get()) {
+                        wakeup.wait();
+                    }
+                    wakeup.set(false);
+                }
             }
         }
         midnightTimer.cancel();
@@ -200,14 +210,23 @@ class getUserInput implements Runnable{
         }
 
         //shutdown whether shutdown command received or an exception occurred
-        main.shutdown.set(true);
-        main.shutdown.notify();
+        synchronized (main.shutdown) {
+            main.shutdown.set(true);
+            main.shutdown.notify();
+        }
+        synchronized (main.wakeup) {
+            main.wakeup.set(true);
+            main.wakeup.notify();
+        }
     }
 }
 
 class midnightTask extends TimerTask implements Runnable {
     public void run() {
-        main.wakeup.notify();
+        synchronized (main.wakeup) {
+            main.wakeup.set(true);
+            main.wakeup.notify();
+        }
         main.setMidnightTimer();
     }
 }
