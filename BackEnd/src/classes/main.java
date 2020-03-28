@@ -58,6 +58,7 @@ public class main {
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
             }
             else if (newDay.get() && !FileIO.fileComplete) {
+                newDay.set(false);
                 sleep = false;
                 shutdown.wait(300000); //wait 5 minutes for front ends to write out file
             }
