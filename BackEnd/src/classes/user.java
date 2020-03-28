@@ -28,7 +28,7 @@ public class user {
            credit: the credit of the user
     output: this
      */
-    user(String username, String userType, String credit) {
+    public user(String username, String userType, String credit) {
         this.username = username;
         /*
         if (userType.compareTo("AA") == 0) {

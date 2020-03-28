@@ -21,11 +21,26 @@ public class Item {
     Output: none
     */
     public Item(String itemName, String sellerName, String highestBidderName, String remainingDays, String bidPrice){
-        this.itemName = itemName;
+    	
+    	this.itemName = itemName;
         this.sellerName = sellerName;
         this.highestBidderName = highestBidderName;
-        this.bidPrice = Double.valueOf(bidPrice);
-        this.remaningDays = Short.valueOf(remainingDays);
+        
+        try {
+        	this.bidPrice = Double.valueOf(bidPrice);
+        } catch (NumberFormatException e) {
+        	//replace with print to error file
+        	System.out.printf("Value of passed bid price for item \"%s\" was not a string\n", itemName);
+        	throw new NumberFormatException();
+        }
+        
+        try {
+        	this.remaningDays = Short.valueOf(remainingDays);
+        }catch (NumberFormatException e) {
+        	//replace with print to error file
+        	System.out.printf("Value of passed remaining days for item \"%s\" was not a string\n", itemName);
+        	throw new NumberFormatException();
+        }
     }
 
     /*
@@ -126,6 +141,33 @@ public class Item {
     */
     @Override
     public String toString() {
-        return "item description";
+        return String.format("%s %s %s %09.2f %03d",
+        					 this.itemName, 
+        					 this.sellerName, 
+        					 this.highestBidderName,
+        					 this.bidPrice,
+        					 this.remaningDays);
     }
+    
+    @Override
+    public boolean equals(Object o) {
+    	
+    	if(o == this) {
+    		return true;
+    	}
+    	
+    	if(!(o instanceof Item)) {
+    		return false;
+    	}
+    	Item other = (Item) o;
+    	
+    	if(!(this.itemName.equals(other.getItemName()))) return false;
+    	if(!(this.sellerName.equals(other.getSellerName()))) return false;
+    	if(!(this.highestBidderName.equals(other.getBidderName()))) return false;
+    	if(this.bidPrice != other.getBidPrice()) return false;
+    	if(this.remaningDays != other.getRemaningDays()) return false;
+    	
+    	return true;
+    }
+    
 }
