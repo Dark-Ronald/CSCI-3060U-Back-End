@@ -24,8 +24,9 @@ import static java.util.Calendar.YEAR;
 public class main {
     public static AtomicBoolean wakeup;
     public static AtomicBoolean shutdown;
-    public static LocalDate today;
-    public static boolean newDay = false; //used for updating metadata
+    public static midnightTask task = new midnightTask();
+    public static Timer midnightTimer = new Timer();
+    public static AtomicBoolean newDay;
     /*
     main loop of program
     input: String[] args: names of or paths to available_items and current_user_accounts files.
@@ -33,10 +34,11 @@ public class main {
     output: None
      */
     public static void main(String[] args) throws java.lang.InterruptedException {
-        //TODO
-        //if no paths given for files then assume they are in the current working directory
-
-        FileIO.setPaths(args[1], args[2], args[3]);
+        String[] paths = new String[3];
+        for (int i = 0; i < args.length - 1; i++) {
+            paths[i] = args[i + 1];
+        }
+        FileIO.setPaths(paths[1], paths[2], paths[3]);
 
         shutdown.set(false);
         wakeup.set(false);
@@ -45,39 +47,23 @@ public class main {
         userInput.start();
 
         connectionHandler.init();
-        midnightTask task = new midnightTask();
-        Timer midnightTimer = new Timer();
-        GregorianCalendar midnightTime = new GregorianCalendar();
-        midnightTime.set(
-                midnightTime.get(YEAR),
-                midnightTime.get(MONTH),
-                midnightTime.get(DAY_OF_MONTH) + 1,
-                0,
-                0,
-                0
-        );
-        midnightTimer.schedule(task, midnightTime.getTime());
+        setMidnightTimer();
 
         while(!shutdown.get()) {
-            if (today.compareTo(LocalDate.now()) != 0) {
-                newDay = true;
-                today = LocalDate.now();
-                //FileIO.setTransactionFileToPreviousDays();
-            }
-
-            if (FileIO.readFiles(parser.currentUserAccounts, parser.availableItems)) {
+            boolean sleep = true;
+            if (FileIO.readFiles(parser.currentUserAccounts, parser.availableItems) && !newDay.get()) {
 
                 processDailyTransactionFile();
 
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
             }
-
-            newDay = false;
-
-            //TODO
-            //sleep until midnight of current day
-
-            wakeup.wait();
+            else if (newDay.get() && !FileIO.fileComplete) {
+                sleep = false;
+                shutdown.wait(300000); //wait 5 minutes for front ends to write out file
+            }
+            if (sleep) {
+                wakeup.wait();
+            }
         }
         midnightTimer.cancel();
         userInput.join();
@@ -129,13 +115,17 @@ public class main {
         }
     }
 
-    /*
-    creates and waits on sleep timer set for start of the next day
-    input: None
-    output: None
-     */
-    public void sleep() {
-
+    public static void setMidnightTimer() {
+        GregorianCalendar midnightTime = new GregorianCalendar();
+        midnightTime.set(
+                midnightTime.get(YEAR),
+                midnightTime.get(MONTH),
+                midnightTime.get(DAY_OF_MONTH) + 1,
+                0,
+                0,
+                0
+        );
+        midnightTimer.schedule(task, midnightTime.getTime());
     }
 }
 
@@ -154,13 +144,13 @@ class getUserInput implements Runnable{
 
         //shutdown whether shutdown command received or an exception occurred
         main.shutdown.set(true);
+        main.shutdown.notify();
     }
 }
 
 class midnightTask extends TimerTask implements Runnable {
-
     public void run() {
-        
         main.wakeup.notify();
+        main.setMidnightTimer();
     }
 }

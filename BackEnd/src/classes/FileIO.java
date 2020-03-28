@@ -43,7 +43,7 @@ public class FileIO{
     file is read into a list of item objects
     input: users: a pointer to a user ArrayList
            items: a pointer to an Item ArrayList
-    Outputs: a return of true or false, based on whether or not the read was succsesful
+    Outputs: true if there exists new data to process, false otherwise
     */
     public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items){
         readMeta();
@@ -103,6 +103,9 @@ public class FileIO{
             dailyTransactionFileReader.close();
             if (linesRead == lineLeftAt) {
                 currentUserAccountsReader.close();
+                if (fileComplete) {
+                    updateMeta();
+                }
                 return false; //stop processing of current file if it hasnt changed since it was last processed
             }
         }
@@ -163,13 +166,13 @@ public class FileIO{
     }
 
     private static int dTFListI = 0;
-    private static int dTFListIDefault = 0;
+    private static int dTFListIDefault = 0; //Index of currentTransactionFilePath in dTFList
 
     public static ArrayList<String> getPreviousDTFs(boolean reset) {
         if (reset) {
-            dTFListI = dTFListIDefault;
             dTFList = new ArrayList<>();
             getDTFList();
+            dTFListI = dTFListIDefault;
         }
         if (dTFListI >= dTFList.size()) {
             return null;
@@ -210,9 +213,10 @@ public class FileIO{
     private static boolean getDTFList() {
         Path transactionFilesDir = Paths.get(transactionFilePath).toAbsolutePath();
         int i = 0;
+        dTFListIDefault = 0;
         for (Path p : transactionFilesDir) {
             if (p.compareTo(currentTransactionFilePath) == 0) {
-                dTFListI = i;
+                dTFListIDefault = i;
             }
             String fileName = p.getFileName().toString();
             int lI = fileName.lastIndexOf('.');
@@ -255,14 +259,20 @@ public class FileIO{
     }
     */
     private static int lineLeftAt;
+    public static boolean fileComplete = false;
 
     private static void updateMeta() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("meta.inf"));
-            if (!main.newDay) {
+            if (!fileComplete) {
                 writer.write(currentTransactionFilePath.getFileName().toString());
                 writer.newLine();
                 writer.write(linesRead + lineLeftAt);
+            }
+            else {
+                writer.write(dTFList.get(dTFListIDefault - 1).getFileName().toString());
+                writer.newLine();
+                writer.write("0");
             }
             writer.close();
         }
@@ -276,6 +286,16 @@ public class FileIO{
             BufferedReader reader = new BufferedReader(new FileReader("meta.inf"));
             currentTransactionFilePath = Paths.get(reader.readLine()).toAbsolutePath();
             lineLeftAt = Integer.valueOf(reader.readLine());
+            reader.close();
+            getDTFList();
+            /*
+            if there is a more recent file, then this will be the last time that the
+            transaction file marked by the meta data will need to be processed
+             */
+            if (dTFListIDefault != 0) {
+                fileComplete = true;
+            }
+
         }
         catch (java.io.FileNotFoundException e) {
             currentTransactionFilePath = null;
