@@ -45,7 +45,13 @@ public class user {
         }
         */
         this.userType = userType;
-        this.credit = Double.valueOf(credit);
+        
+        try {
+        	this.credit = Double.valueOf(credit);
+        } catch (NumberFormatException e) {
+        	System.out.printf("The credit passed by user \"%s\" was not a number\n", username);
+        	throw new NumberFormatException();
+        }
     }
 
     /*
@@ -77,5 +83,21 @@ public class user {
 
     public String getUserType() {
         return userType;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+    	
+    	if(o == this) return true;
+    	
+    	if(!(o instanceof user)) return false;
+    	
+    	user other = (user) o;
+    	
+    	if(!(this.username.equals(other.getUsername()))) return false;
+    	if(!(this.userType.equals(other.getUserType()))) return false;
+    	if(this.credit != other.getCredit()) return false;
+    	
+    	return true;
     }
 }

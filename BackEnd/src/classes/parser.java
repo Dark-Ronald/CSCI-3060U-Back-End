@@ -22,6 +22,13 @@ public class parser {
     	currentUserAccounts.clear();
     }
     
+    public static user searchUser(String name) {
+    	for(user u: currentUserAccounts) {
+    		if(u.getUsername().equals(name)) return u;
+    	}
+    	return null;
+    }
+    
     public static void addItem(Item item) {
     	availableItems.add(item);
     }
@@ -30,18 +37,9 @@ public class parser {
     	availableItems.clear();
     }
     
-    public static user searchUser(String name) {
-    	for(user u: currentUserAccounts) {
-    		if(u.getUsername() == name) return u;
-    	}
-    	return null;
-    }
-    
     public static Item searchItem(String name) {
     	for(Item item: availableItems) {
-    		if(item.getItemName().equals(name)) {
-    			return item;
-    		}
+    		if(item.getItemName().equals(name)) return item;
     	}
     	return null;
     }
@@ -108,7 +106,7 @@ public class parser {
         for (user user : currentUserAccounts) {
             if (user.getUsername().compareTo(username) == 0) {
                 System.out.println("ERROR: Creation Of New User With Existing Name.  Transaction: " + transaction);
-                return;
+                throw new IllegalArgumentException();
             }
         }
         String userType = transaction.substring(19, 21);
@@ -264,7 +262,7 @@ public class parser {
     }
 
     public static void clean() {
-        currentUserAccounts = new ArrayList<>();
-        availableItems = new ArrayList<>();
+        currentUserAccounts.clear();
+        availableItems.clear();
     }
 }
