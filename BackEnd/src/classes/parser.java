@@ -14,8 +14,9 @@ public class parser {
     protected static Date datePreviouslyRun;
 
     //used for testing purposes
-    public static void addUser(user newUser) {
-    	currentUserAccounts.add(newUser);
+    public static void addUsers(user... users) {
+    	for(user newUser : users)
+    		currentUserAccounts.add(newUser);
     }
     
     public static void clearUsers() {
@@ -29,8 +30,9 @@ public class parser {
     	return null;
     }
     
-    public static void addItem(Item item) {
-    	availableItems.add(item);
+    public static void addItems(Item... items) {
+    	for(Item item : items)
+    		availableItems.add(item);
     }
     
     public static void clearItems() {
@@ -245,20 +247,25 @@ public class parser {
                         double sellerCredit = sellerAccount.getCredit();
                         if (sellerCredit - credit < 0) {
                             System.out.println("ERROR: Seller Doesn't Have Enough Credit For Refund.  Transaction: " + transaction);
-                            return;
+                            throw new IllegalArgumentException(); 
                         }
                         else if (buyerCredit + credit > 999999) {
                             System.out.println("ERROR: Refund Causes Buyers Credit To Exceed Maximum User Credit.  Transaction: " + transaction);
-                            return;
+                            throw new IllegalArgumentException();
                         }
                         else {
                             sellerAccount.setCredit(sellerCredit - credit);
                             buyerAccount.setCredit(buyerCredit + credit);
+                            return;
                         }
                     }
                 }
+                System.out.println("The Sellers username does not exist");
+                throw new NoSuchElementException();
             }
         }
+        System.out.println("The Buyers username does not exist");
+        throw new NoSuchElementException();
     }
 
     public static void clean() {

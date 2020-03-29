@@ -86,6 +86,14 @@ public class user {
     }
     
     @Override
+    public String toString() {
+    	return String.format("%s %s %09.2f",
+    						  this.username,
+    						  this.userType,
+    						  this.credit);
+    }
+    
+    @Override
     public boolean equals(Object o) {
     	
     	if(o == this) return true;
