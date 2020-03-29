@@ -8,6 +8,7 @@ output files: available_items.txt
 Program is intended to be left running indefinitely, performing all functions at the start
 of everyday, or when it is signaled to wake, then returning to sleep
  */
+
 package classes;
 
 import java.io.BufferedReader;
