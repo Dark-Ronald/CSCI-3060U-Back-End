@@ -57,7 +57,7 @@ public class parser {
         String daysToAuction = "0"; // filler
         String bidderBid = transaction.substring(51,56);
 
-        //Collect all bids to be processed later, check later if the auction part of item array can be null
+        //Collect all bids to be processed later
         bidList.add(new Item(itemName, sellerName, bidderName, daysToAuction ,bidderBid));
 
     }
