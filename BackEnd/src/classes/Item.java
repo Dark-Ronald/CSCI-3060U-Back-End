@@ -140,7 +140,7 @@ public class Item {
     input: ArrayList bidList, ArrayList available item
     output: none, modifies the ArrayList availableItems
     */
-    public static void bid(ArrayList<Item> bidList, ArrayList<Item> availableItems){
+    public static void bidSort(ArrayList<Item> bidList, ArrayList<Item> availableItems){
         Item[] bidArray = bidList.toArray(new Item[bidList.size()]);
 
         //Loop through every bid from daily transaction file
