@@ -6,6 +6,7 @@ This also handles printing out fatal errors like thrying to read in an unrecogni
 */
 
 package classes;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.io.*;

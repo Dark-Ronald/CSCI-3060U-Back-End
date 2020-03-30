@@ -1,10 +1,11 @@
+package classes;
+
 /*
 Description: This is a simple class used for the storage and handling of an instance of
 each item class, user the simple getter and setter methods, as well as the toString 
 functionallity
 Input: All of the different information nessesary for a single item
 */
-package classes;
 public class Item {
 
     private String itemName;
