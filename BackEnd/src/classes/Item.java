@@ -17,7 +17,7 @@ public class Item {
     private double bidPrice;
     private short remaningDays;
     static ArrayList<Item> uniqueBidList = new ArrayList<Item>();
-
+    static double MAX_BALANCE = 999999.99;
     /*
     Description: A simple constructor for the class, storing all of the nessesary information
     Input: itemName: What the name of the item is, sellerName: the user putting the item up for auction
@@ -181,7 +181,7 @@ public class Item {
     /*
     Description: Decrements all bids by one day and implements payout if the remaining days is equal to 0
     input: ArrayList<Item> available item, ArrayList<user> userArrayList
-    output: none
+    output: none, modifies the ArrayList availableItems and ArrayList userArrayList
     */
     public static void endOfAuction(ArrayList<Item> availableItems, ArrayList<user> userArrayList){
         Item[] availableItemsArray = availableItems.toArray(new Item[availableItems.size()]);
@@ -190,26 +190,41 @@ public class Item {
         for (int b = 0; b < availableItems.size(); b++){
             availableItemsArray[b].decrementRemaningDays();
             // End auction if remaining days = 0
-            if (availableItemsArray[b].remaningDays == 0){
-                String seller = "";
+            if (availableItemsArray[b].remaningDays == 0 && !availableItemsArray[b].getBidderName().trim().isEmpty()){
                 double sellersBalance = 0.0;
-                String bidder = "";
                 double biddersBalance = 0.0;
+                double itemBid = availableItemsArray[b].getBidPrice();
 
-                //Loop through userArrayList and find the seller's name and bidder's name
+                //Loop through userArrayList and find the seller's name and bidder's name and deposit/withdraw money respectively
                 for(int c = 0; c < userArrayList.size(); c++){
                     if (availableItemsArray[b].getSellerName().compareTo(userRegularArray[c].getUsername()) == 0){
-                        seller = userRegularArray[c].getUsername();
                         sellersBalance = userRegularArray[c].getCredit();
+                        sellersBalance += itemBid;
+
+                        //If seller's balance is greater than MAX_BALANCE then set it to max
+                        if (sellersBalance > MAX_BALANCE){
+                            sellersBalance = MAX_BALANCE;
+                        }
+                        userRegularArray[c].setCredit(sellersBalance);
                     }
                     if (availableItemsArray[b].getBidderName().compareTo(userRegularArray[c].getUsername()) == 0){
-                        bidder = userRegularArray[c].getUsername();
                         biddersBalance = userRegularArray[c].getCredit();
+                        biddersBalance -= itemBid;
+                        userRegularArray[c].setCredit(biddersBalance);
                     }
                 }
+                //Remove the item from the array
             }
-        }
-        availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
 
+            //If there are no bidders at the end of auction for an item
+            //Remove the bid and do not calculate anything
+            if (availableItemsArray[b].remaningDays == 0 && availableItemsArray[b].getBidderName().trim().isEmpty()){
+
+            }
+
+        }
+        //Convert availableItemsArray and userRegularArray back to a list
+        availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
+        userArrayList = new ArrayList<user>(Arrays.asList(userRegularArray));
     }
 }
