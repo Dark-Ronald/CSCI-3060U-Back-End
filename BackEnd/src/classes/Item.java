@@ -137,28 +137,22 @@ public class Item {
 
     /* 
     Description: Handles the bidding and modifies the available items array
-    input: bidList array, available item array
-    output: none
+    input: ArrayList bidList, ArrayList available item
+    output: none, modifies the ArrayList availableItems
     */
-    public void bid(ArrayList<Item> bidList, ArrayList<Item> availableItems){
-        // Create an array of unique bids to compare bids
+    public static void bid(ArrayList<Item> bidList, ArrayList<Item> availableItems){
+        Item[] bidArray = bidList.toArray(new Item[bidList.size()]);
 
         //Loop through every bid from daily transaction file
         for (int i = 0; i < bidList.size(); i++){
             //Loop through the uniqueBidList
             for (int j = 0; j < uniqueBidList.size(); j++){
-                // If both compareTo's are equal to zero then that means there has been a match
+                // If both compareTo's are equal to zero then that means it's match
                 // and bid is not unique so we have to compare bids and take the highest bid
-                Item[] bidArray = bidList.toArray(new Item[bidList.size()]);
                 Item[] uniqueArray = uniqueBidList.toArray(new Item[uniqueBidList.size()]);
                 if (bidArray[i].getItemName().compareTo(uniqueArray[j].getItemName()) == 0 && bidArray[i].getSellerName().compareTo(uniqueArray[j].getSellerName()) == 0){
-                    //compare the bids, need to convert both bids to double to compare
-                    double compareBidList = 0.0;
-                    double compareUniqueBidList = 0.0;
-
-                    compareBidList = (bidArray[i].getBidPrice());
-                    compareUniqueBidList = (uniqueArray[i].getBidPrice());
-                    if (compareBidList > compareUniqueBidList){
+                    //compare the bids
+                    if (bidArray[i].getBidPrice() > uniqueArray[i].getBidPrice()){
                         uniqueArray[j].setBidPrice(bidArray[i].getBidPrice());
                     }
                 // otherwise it's unique so we add it to uniqueBidList array
@@ -182,5 +176,40 @@ public class Item {
         }
         //Convert availableItemsArray back to a list
         availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
+    }
+
+    /*
+    Description: Decrements all bids by one day and implements payout if the remaining days is equal to 0
+    input: ArrayList<Item> available item, ArrayList<user> userArrayList
+    output: none
+    */
+    public static void endOfAuction(ArrayList<Item> availableItems, ArrayList<user> userArrayList){
+        Item[] availableItemsArray = availableItems.toArray(new Item[availableItems.size()]);
+        user[] userRegularArray = userArrayList.toArray(new user[userArrayList.size()]);
+
+        for (int b = 0; b < availableItems.size(); b++){
+            availableItemsArray[b].decrementRemaningDays();
+            // End auction if remaining days = 0
+            if (availableItemsArray[b].remaningDays == 0){
+                String seller = "";
+                double sellersBalance = 0.0;
+                String bidder = "";
+                double biddersBalance = 0.0;
+
+                //Loop through userArrayList and find the seller's name and bidder's name
+                for(int c = 0; c < userArrayList.size(); c++){
+                    if (availableItemsArray[b].getSellerName().compareTo(userRegularArray[c].getUsername()) == 0){
+                        seller = userRegularArray[c].getUsername();
+                        sellersBalance = userRegularArray[c].getCredit();
+                    }
+                    if (availableItemsArray[b].getBidderName().compareTo(userRegularArray[c].getUsername()) == 0){
+                        bidder = userRegularArray[c].getUsername();
+                        biddersBalance = userRegularArray[c].getCredit();
+                    }
+                }
+            }
+        }
+        availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
+
     }
 }
