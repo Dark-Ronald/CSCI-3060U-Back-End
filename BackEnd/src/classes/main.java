@@ -57,7 +57,6 @@ public class main {
 
                 processDailyTransactionFile();
                 if (newDayFlag){
-                    Item.bidSort(parser.bidList, parser.availableItems);
                     runAuctionDay(parser.currentUserAccounts, parser.availableItems);
                 }
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);

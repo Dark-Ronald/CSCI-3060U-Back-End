@@ -16,8 +16,6 @@ public class Item {
     private String highestBidderName;
     private double bidPrice;
     private short remaningDays;
-    static ArrayList<Item> uniqueBidList = new ArrayList<Item>();
-    static double MAX_BALANCE = 999999.99;
     /*
     Description: A simple constructor for the class, storing all of the nessesary information
     Input: itemName: What the name of the item is, sellerName: the user putting the item up for auction
@@ -135,13 +133,14 @@ public class Item {
     }
 
 
-    /* 
+    /*
     Description: Handles the bidding and modifies the available items array
     input: ArrayList bidList, ArrayList available item
     output: none, modifies the ArrayList availableItems
     */
-    public static void bidSort(ArrayList<Item> bidList, ArrayList<Item> availableItems){
+/*    public static void bidSort(ArrayList<Item> bidList, ArrayList<Item> availableItems){
         Item[] bidArray = bidList.toArray(new Item[bidList.size()]);
+        ArrayList<Item> uniqueBidList = new ArrayList<Item>();
 
         //Loop through every bid from daily transaction file
         for (int i = 0; i < bidList.size(); i++){
@@ -161,7 +160,6 @@ public class Item {
                     uniqueBidList.add(new Item(bidArray[i].getItemName(), bidArray[i].getSellerName(), bidArray[i].getBidderName(), "0", strBidPrice));
                 }
             }
-
         }
         //Merge the uniqueBidList array with the available items array
         Item[] completeUniqueArray = uniqueBidList.toArray(new Item[uniqueBidList.size()]);
@@ -175,6 +173,6 @@ public class Item {
             }
         }
         //Convert availableItemsArray back to a list
-        availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
-    }
+        parser.availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
+    }*/
 }

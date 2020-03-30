@@ -1,6 +1,7 @@
 package classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Collections;
 
@@ -10,7 +11,6 @@ utility class for parsing the lines of the daily_transaction file
 public class parser {
     static ArrayList<user> currentUserAccounts = new ArrayList<user>();
     static ArrayList<Item> availableItems = new ArrayList<Item>();
-    static ArrayList<Item> bidList = new ArrayList<Item>();
     static Date datePreviouslyRun;
 
     /*
@@ -54,12 +54,23 @@ public class parser {
         String itemName = transaction.substring(3, 22);
         String sellerName = transaction.substring(23, 36);
         String bidderName = transaction.substring(37, 50);
-        String daysToAuction = "0"; // filler
         String bidderBid = transaction.substring(51,56);
 
-        //Collect all bids to be processed later
-        bidList.add(new Item(itemName, sellerName, bidderName, daysToAuction ,bidderBid));
+        Item[] availableItemsArray = availableItems.toArray(new Item[availableItems.size()]);
 
+        for (int i = 0; i < availableItems.size(); i++){
+            //if item name and seller's name matches, check if the bid is greater than the current price
+            if (availableItemsArray[i].getItemName().compareTo(itemName) == 0 && availableItemsArray[i].getSellerName().compareTo(sellerName) == 0){
+
+                //Convert bidderBid to double
+                double dblBidPrice = Double.parseDouble(bidderBid);
+                if (dblBidPrice > availableItemsArray[i].getBidPrice()){
+                    availableItemsArray[i].setBidPrice(dblBidPrice);
+                    availableItemsArray[i].setBidderName(bidderName);
+                }
+            }
+        }
+        parser.availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
     }
 
     /*
