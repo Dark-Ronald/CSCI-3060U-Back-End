@@ -56,10 +56,9 @@ public class main {
             if (FileIO.readFiles(parser.currentUserAccounts, parser.availableItems) && !newDay.get()) {
 
                 processDailyTransactionFile();
-                if (newDayFlag) {
+                if (newDayFlag){
                     runAuctionDay(parser.currentUserAccounts, parser.availableItems);
                 }
-
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
                 parser.clean();
             }
