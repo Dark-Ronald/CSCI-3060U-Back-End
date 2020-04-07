@@ -2,31 +2,76 @@ package classes;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Collections;
 
 /*
 utility class for parsing the lines of the daily_transaction file
  */
 public class parser {
-    static ArrayList<user> currentUserAccounts = new ArrayList<user>();
-    static ArrayList<Item> availableItems = new ArrayList<Item>();
-    static Date datePreviouslyRun;
+    protected static ArrayList<user> currentUserAccounts = new ArrayList<user>();
+    protected static ArrayList<Item> availableItems = new ArrayList<Item>();
+    protected static Date datePreviouslyRun;
 
+    //used for testing purposes
+    public static void addUsers(user... users) {
+    	for(user newUser : users)
+    		currentUserAccounts.add(newUser);
+    }
+    
+    public static void clearUsers() {
+    	currentUserAccounts.clear();
+    }
+    
+    public static user searchUser(String name) {
+    	for(user u: currentUserAccounts) {
+    		if(u.getUsername().equals(name)) return u;
+    	}
+    	return null;
+    }
+    
+    public static void addItems(Item... items) {
+    	for(Item item : items)
+    		availableItems.add(item);
+    }
+    
+    public static void clearItems() {
+    	availableItems.clear();
+    }
+    
+    public static Item searchItem(String name) {
+    	for(Item item: availableItems) {
+    		if(item.getItemName().equals(name)) return item;
+    	}
+    	return null;
+    }
+    
     /*
     gets the user to add credit to, then sets their credit to the credit value in the
     transaction
     input: transaction: a line of the daily_transaction file with addcredit code
     output: None
      */
-    static void addCredit(String transaction) {
+    public static void addCredit(String transaction) {
         String username = transaction.substring(3, 18);
-        double credit = Double.valueOf(transaction.substring(22, 31));
+        double credit = 0.0;
+        
+        try {
+        	credit = Double.valueOf(transaction.substring(22, 31));
+        } catch(NumberFormatException e) {
+        	System.out.printf("Credit for addCredit transaction by user \"%s\" is not a number\n", username);
+        	throw new NumberFormatException();
+        }
+        
         for (user userAccount : currentUserAccounts) {
             if (username.compareTo(userAccount.getUsername()) == 0) {
-                userAccount.setCredit(credit);
+                userAccount.setCredit(credit + userAccount.getCredit());
                 return;
             }
         }
+        
+        System.out.printf("User \"%s\" does not exist!\n", username);
+        throw new NoSuchElementException();
     }
 
     /*
@@ -34,13 +79,13 @@ public class parser {
     input: transaction: a line of the daily_transaction file with advertise code
     output: None
      */
-    static void advertise(String transaction) {
+    public static void advertise(String transaction) {
         String itemName = transaction.substring(3, 22);
-        String sellerName = transaction.substring(23, 36);
-        String daysToAuction = transaction.substring(37, 40);
-        String minBid = transaction.substring(41, 47);
+        String sellerName = transaction.substring(23, 38);
+        String daysToAuction = transaction.substring(39, 42);
+        String minBid = transaction.substring(43, 50);
         String buyerName = "               ";
-
+        
         availableItems.add(new Item(itemName, sellerName, buyerName, daysToAuction, minBid));
     }
 
@@ -49,7 +94,7 @@ public class parser {
     input: transaction: a line of the daily_transaction file with bid code
     output: None
      */
-    static void bid(String transaction) {
+    public static void bid(String transaction) {
 
     }
 
@@ -58,12 +103,12 @@ public class parser {
     input: transaction: a line of the daily_transaction file with create code
     output: None
      */
-    static void create(String transaction) {
+    public static void create(String transaction) {
         String username = transaction.substring(3, 18);
         for (user user : currentUserAccounts) {
             if (user.getUsername().compareTo(username) == 0) {
                 System.out.println("ERROR: Creation Of New User With Existing Name.  Transaction: " + transaction);
-                return;
+                throw new IllegalArgumentException();
             }
         }
         String userType = transaction.substring(19, 21);
@@ -79,7 +124,7 @@ public class parser {
     input: transaction: a line of the daily_transaction file with delete code
     output: None
      */
-    static void deleteUser(String transaction) {
+    public static void deleteUser(String transaction) {
         /*
         if user being deleted is the highest bidder on an item, then when they are deleted
         the second highest bidder needs to be found and replace the deleted user in the item
@@ -189,7 +234,7 @@ public class parser {
     input: transaction: a line of the daily_transaction file with create code
     output: None
      */
-    static void refund(String transaction) {
+    public static void refund(String transaction) {
         String buyerName = transaction.substring(3, 18);
         String sellerName = transaction.substring(19, 34);
         double credit = Double.valueOf(transaction.substring(35, 43));
@@ -202,24 +247,29 @@ public class parser {
                         double sellerCredit = sellerAccount.getCredit();
                         if (sellerCredit - credit < 0) {
                             System.out.println("ERROR: Seller Doesn't Have Enough Credit For Refund.  Transaction: " + transaction);
-                            return;
+                            throw new IllegalArgumentException(); 
                         }
                         else if (buyerCredit + credit > 999999) {
                             System.out.println("ERROR: Refund Causes Buyers Credit To Exceed Maximum User Credit.  Transaction: " + transaction);
-                            return;
+                            throw new IllegalArgumentException();
                         }
                         else {
                             sellerAccount.setCredit(sellerCredit - credit);
                             buyerAccount.setCredit(buyerCredit + credit);
+                            return;
                         }
                     }
                 }
+                System.out.println("The Sellers username does not exist");
+                throw new NoSuchElementException();
             }
         }
+        System.out.println("The Buyers username does not exist");
+        throw new NoSuchElementException();
     }
 
     public static void clean() {
-        currentUserAccounts = new ArrayList<>();
-        availableItems = new ArrayList<>();
+        currentUserAccounts.clear();
+        availableItems.clear();
     }
 }
