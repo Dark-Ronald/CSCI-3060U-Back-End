@@ -1,13 +1,11 @@
+package classes;
+
 /*
 Description: This is a simple class used for the storage and handling of an instance of
 each item class, user the simple getter and setter methods, as well as the toString 
 functionallity
 Input: All of the different information nessesary for a single item
 */
-package classes;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Item {
 
@@ -24,11 +22,36 @@ public class Item {
     Output: none
     */
     public Item(String itemName, String sellerName, String highestBidderName, String remainingDays, String bidPrice){
-        this.itemName = itemName;
+    	
+    	this.itemName = itemName;
         this.sellerName = sellerName;
         this.highestBidderName = highestBidderName;
-        this.bidPrice = Double.valueOf(bidPrice);
-        this.remaningDays = Short.valueOf(remainingDays);
+        
+        try {
+        	this.bidPrice = Double.valueOf(bidPrice);
+        } catch (NumberFormatException e) {
+        	//replace with print to error file
+        	System.out.println("ERROR: Item Bid Price Is Not A Number.  Item Listing: " +
+                    itemName + " " +
+                    sellerName + " " +
+                    highestBidderName + " " +
+                    remainingDays + " " +
+                    bidPrice);
+        	throw new NumberFormatException();
+        }
+        
+        try {
+        	this.remaningDays = Short.valueOf(remainingDays);
+        }catch (NumberFormatException e) {
+        	//replace with print to error file
+        	System.out.printf("ERROR: Item Days To Auction Is Not A Number.  Item Listing: " +
+                    itemName + " " +
+                    sellerName + " " +
+                    highestBidderName + " " +
+                    remainingDays + " " +
+                    bidPrice);
+        	throw new NumberFormatException();
+        }
     }
 
     /*
@@ -129,50 +152,32 @@ public class Item {
     */
     @Override
     public String toString() {
-        return "item description";
+        return String.format("%s %s %s %09.2f %03d",
+        					 this.itemName, 
+        					 this.sellerName, 
+        					 this.highestBidderName,
+        					 this.bidPrice,
+        					 this.remaningDays);
     }
-
-
-    /*
-    Description: Handles the bidding and modifies the available items array
-    input: ArrayList bidList, ArrayList available item
-    output: none, modifies the ArrayList availableItems
-    */
-/*    public static void bidSort(ArrayList<Item> bidList, ArrayList<Item> availableItems){
-        Item[] bidArray = bidList.toArray(new Item[bidList.size()]);
-        ArrayList<Item> uniqueBidList = new ArrayList<Item>();
-
-        //Loop through every bid from daily transaction file
-        for (int i = 0; i < bidList.size(); i++){
-            //Loop through the uniqueBidList
-            for (int j = 0; j < uniqueBidList.size(); j++){
-                // If both compareTo's are equal to zero then that means it's match
-                // and bid is not unique so we have to compare bids and take the highest bid
-                Item[] uniqueArray = uniqueBidList.toArray(new Item[uniqueBidList.size()]);
-                if (bidArray[i].getItemName().compareTo(uniqueArray[j].getItemName()) == 0 && bidArray[i].getSellerName().compareTo(uniqueArray[j].getSellerName()) == 0){
-                    //compare the bids
-                    if (bidArray[i].getBidPrice() > uniqueArray[i].getBidPrice()){
-                        uniqueArray[j].setBidPrice(bidArray[i].getBidPrice());
-                    }
-                // otherwise it's unique so we add it to uniqueBidList array
-                } else {
-                    String strBidPrice = Double.toString(bidArray[i].getBidPrice());
-                    uniqueBidList.add(new Item(bidArray[i].getItemName(), bidArray[i].getSellerName(), bidArray[i].getBidderName(), "0", strBidPrice));
-                }
-            }
-        }
-        //Merge the uniqueBidList array with the available items array
-        Item[] completeUniqueArray = uniqueBidList.toArray(new Item[uniqueBidList.size()]);
-        Item[] availableItemsArray = availableItems.toArray(new Item[availableItems.size()]);
-        for (int z = 0; z < uniqueBidList.size(); z++){
-            for (int k = 0; k < availableItems.size(); k++){
-                if (completeUniqueArray[z].getItemName().compareTo(availableItemsArray[k].getItemName()) == 0 && completeUniqueArray[z].getSellerName().compareTo(availableItemsArray[k].getSellerName()) == 0){
-                    availableItemsArray[k].setBidderName(completeUniqueArray[z].getBidderName());
-                    availableItemsArray[k].setBidPrice(completeUniqueArray[z].getBidPrice());
-                }
-            }
-        }
-        //Convert availableItemsArray back to a list
-        parser.availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
-    }*/
+    
+    @Override
+    public boolean equals(Object o) {
+    	
+    	if(o == this) {
+    		return true;
+    	}
+    	
+    	if(!(o instanceof Item)) {
+    		return false;
+    	}
+    	Item other = (Item) o;
+    	
+    	if(!(this.itemName.equals(other.getItemName()))) return false;
+    	if(!(this.sellerName.equals(other.getSellerName()))) return false;
+    	if(!(this.highestBidderName.equals(other.getBidderName()))) return false;
+    	if(this.bidPrice != other.getBidPrice()) return false;
+    	if(this.remaningDays != other.getRemaningDays()) return false;
+    	
+    	return true;
+    }
 }

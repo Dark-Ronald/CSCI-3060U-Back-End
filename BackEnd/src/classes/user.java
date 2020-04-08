@@ -1,8 +1,8 @@
+package classes;
+
 /*
 class to represent a user of the auction system
  */
-package classes;
-
 public class user {
     //userTypes userType;
     private String userType;
@@ -28,7 +28,7 @@ public class user {
            credit: the credit of the user
     output: this
      */
-    user(String username, String userType, String credit) {
+    public user(String username, String userType, String credit) {
         this.username = username;
         /*
         if (userType.compareTo("AA") == 0) {
@@ -45,7 +45,16 @@ public class user {
         }
         */
         this.userType = userType;
-        this.credit = Double.valueOf(credit);
+        
+        try {
+        	this.credit = Double.valueOf(credit);
+        } catch (NumberFormatException e) {
+        	System.out.printf("ERROR: User Credit Is Not A Number.  User Listing: " +
+                username + " " +
+                userType + " " +
+                credit);
+        	throw new NumberFormatException();
+        }
     }
 
     /*
@@ -77,5 +86,29 @@ public class user {
 
     public String getUserType() {
         return userType;
+    }
+    
+    @Override
+    public String toString() {
+    	return String.format("%s %s %09.2f",
+    						  this.username,
+    						  this.userType,
+    						  this.credit);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+    	
+    	if(o == this) return true;
+    	
+    	if(!(o instanceof user)) return false;
+    	
+    	user other = (user) o;
+    	
+    	if(!(this.username.equals(other.getUsername()))) return false;
+    	if(!(this.userType.equals(other.getUserType()))) return false;
+    	if(this.credit != other.getCredit()) return false;
+    	
+    	return true;
     }
 }

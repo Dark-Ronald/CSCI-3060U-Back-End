@@ -3,31 +3,46 @@ package classes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Collections;
 
 /*
 utility class for parsing the lines of the daily_transaction file
  */
 public class parser {
-    static ArrayList<user> currentUserAccounts = new ArrayList<user>();
-    static ArrayList<Item> availableItems = new ArrayList<Item>();
-    static Date datePreviouslyRun;
-
+    protected static ArrayList<user> currentUserAccounts = new ArrayList<user>();
+    protected static ArrayList<Item> availableItems = new ArrayList<Item>();
+    protected static Date datePreviouslyRun;
+    
     /*
     gets the user to add credit to, then sets their credit to the credit value in the
     transaction
     input: transaction: a line of the daily_transaction file with addcredit code
     output: None
      */
-    static void addCredit(String transaction) {
+    public static void addCredit(String transaction) {
         String username = transaction.substring(3, 18);
-        double credit = Double.valueOf(transaction.substring(22, 31));
+        double credit = 0;
+        
+        try {
+        	credit = Double.valueOf(transaction.substring(22, 31));
+        } catch(NumberFormatException e) {
+        	System.out.printf("ERROR: Credit Is Not A Number.  Transaction: " + transaction);
+        	return;
+        }
+        
         for (user userAccount : currentUserAccounts) {
             if (username.compareTo(userAccount.getUsername()) == 0) {
-                userAccount.setCredit(credit);
+                if (userAccount.getCredit() + credit > 999999.00) {
+                    System.out.println("ERROR: Adding Credit To User Account Causes User Credit To Exceed Maximum.  Transaction: " + transaction);
+                    return;
+                }
+                userAccount.setCredit(credit + userAccount.getCredit());
                 return;
             }
         }
+        
+        System.out.printf("ERROR: User Does Not Exist.  Transaction: " + transaction);
     }
 
     /*
@@ -35,13 +50,13 @@ public class parser {
     input: transaction: a line of the daily_transaction file with advertise code
     output: None
      */
-    static void advertise(String transaction) {
+    public static void advertise(String transaction) {
         String itemName = transaction.substring(3, 22);
-        String sellerName = transaction.substring(23, 36);
-        String daysToAuction = transaction.substring(37, 40);
-        String minBid = transaction.substring(41, 47);
+        String sellerName = transaction.substring(23, 38);
+        String daysToAuction = transaction.substring(39, 42);
+        String minBid = transaction.substring(43, 50);
         String buyerName = "               ";
-
+        
         availableItems.add(new Item(itemName, sellerName, buyerName, daysToAuction, minBid));
     }
 
@@ -50,27 +65,24 @@ public class parser {
     input: transaction: a line of the daily_transaction file with bid code
     output: None
      */
+
     static void bid(String transaction) {
         String itemName = transaction.substring(3, 22);
         String sellerName = transaction.substring(23, 36);
         String bidderName = transaction.substring(37, 50);
-        String bidderBid = transaction.substring(51,56);
-
-        Item[] availableItemsArray = availableItems.toArray(new Item[availableItems.size()]);
-
-        for (int i = 0; i < availableItems.size(); i++){
+        double bidderBid = Double.valueOf(transaction.substring(51,56));
+        
+        for (Item item : availableItems){
             //if item name and seller's name matches, check if the bid is greater than the current price
-            if (availableItemsArray[i].getItemName().compareTo(itemName) == 0 && availableItemsArray[i].getSellerName().compareTo(sellerName) == 0){
-
-                //Convert bidderBid to double
-                double dblBidPrice = Double.parseDouble(bidderBid);
-                if (dblBidPrice > availableItemsArray[i].getBidPrice()){
-                    availableItemsArray[i].setBidPrice(dblBidPrice);
-                    availableItemsArray[i].setBidderName(bidderName);
+            if (item.getItemName().compareTo(itemName) == 0) && (item.getSellerName().compareTo(sellerName) == 0)) {
+                if (item.getBidPrice() < bidderBid) {
+                    item.setBidderName(bidderName);
+                    item.setBidPrice(bidderBid);
                 }
+                return;
             }
         }
-        parser.availableItems = new ArrayList<Item>(Arrays.asList(availableItemsArray));
+        System.out.println("ERROR: Item Not Being Auctioned By Seller.  Transaction: " + transaction);
     }
 
     /*
@@ -78,12 +90,12 @@ public class parser {
     input: transaction: a line of the daily_transaction file with create code
     output: None
      */
-    static void create(String transaction) {
+    public static void create(String transaction) {
         String username = transaction.substring(3, 18);
         for (user user : currentUserAccounts) {
             if (user.getUsername().compareTo(username) == 0) {
                 System.out.println("ERROR: Creation Of New User With Existing Name.  Transaction: " + transaction);
-                return;
+
             }
         }
         String userType = transaction.substring(19, 21);
@@ -99,7 +111,7 @@ public class parser {
     input: transaction: a line of the daily_transaction file with delete code
     output: None
      */
-    static void deleteUser(String transaction) {
+    public static void deleteUser(String transaction) {
         /*
         if user being deleted is the highest bidder on an item, then when they are deleted
         the second highest bidder needs to be found and replace the deleted user in the item
@@ -209,7 +221,7 @@ public class parser {
     input: transaction: a line of the daily_transaction file with create code
     output: None
      */
-    static void refund(String transaction) {
+    public static void refund(String transaction) {
         String buyerName = transaction.substring(3, 18);
         String sellerName = transaction.substring(19, 34);
         double credit = Double.valueOf(transaction.substring(35, 43));
@@ -231,15 +243,20 @@ public class parser {
                         else {
                             sellerAccount.setCredit(sellerCredit - credit);
                             buyerAccount.setCredit(buyerCredit + credit);
+                            return;
                         }
                     }
                 }
+                System.out.println("ERROR: Sellers Username In Refund Does Not Exist.  Transaction: " + transaction);
+                return;
             }
         }
+        System.out.println("ERROR: Buyers Username In Refund Does Not Exist.  Transaction: " + transaction);
+
     }
 
     public static void clean() {
-        currentUserAccounts = new ArrayList<>();
-        availableItems = new ArrayList<>();
+        currentUserAccounts.clear();
+        availableItems.clear();
     }
 }
