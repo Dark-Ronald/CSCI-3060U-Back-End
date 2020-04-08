@@ -6,7 +6,7 @@
 #define checkTestEnd if (std::cin.peek() == EOF) { std::longjmp(testExit, 1); } else {std::cout << std::endl;}
 #endif
 
-std::string getInputWithSpaces(std::string prompt, std::string errorMsg, int maxLength);
+std::string getInputWithSpaces(std::string prompt, std::string errorMsg, int maxLength, bool padString);
 template <typename Callable>
 std::string getMonetaryInputAsString(std::string prompt, Callable constraintF) {
 	std::string input;

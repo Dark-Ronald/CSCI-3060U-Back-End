@@ -43,19 +43,10 @@ void transactionFileWriter::run() {
 		//at this point, it is midnight, so obtain the lock and write out the dailyTransactionFile
 		lk.lock();
 		
-		string fileName(filePath + to_string(fileNameTime.tm_year) + "-" + to_string(fileNameTime.tm_mon) + "-" +
+		string fileName(filePath + "\\" + to_string(fileNameTime.tm_year + 1900) + "-" + to_string(fileNameTime.tm_mon + 1) + "-" +
 			to_string(fileNameTime.tm_mday) + ".atf");
-		ofstream dTFWriter(fileName);
+		ofstream dTFWriter(fileName, ios::app);
 		
-#if(_DEBUG)
-		ofstream dTFWriter(filePath);
-#else
-		/*
-		store transaction file in folder with name of current date, stored
-		in folder called Daily Transaction Files which is located at the
-		diretory given for the daily transaction file filename
-		*/
-#endif
 		ostream_iterator<string> out_it(dTFWriter, "\n");
 		copy(dailyTransactionFile.begin(), dailyTransactionFile.end(), out_it);
 		dTFWriter.close();
@@ -70,20 +61,10 @@ void transactionFileWriter::writeOut() {
 	localtime_s(&fileNameTime, &curTime);
 
 	lk.lock();
-	/*
-	string fileName(filePath + to_string(fileNameTime.tm_mon) + "-" + to_string(fileNameTime.tm_mday) + "-" +
-		to_string(fileNameTime.tm_year) + ".txt");
-	ofstream dTFWriter(fileName);
-	*/
-#if(_DEBUG)
-	ofstream dTFWriter(filePath);
-#else
-	/*
-	store transaction file in folder with name of current date, stored
-	in folder called Daily Transaction Files which is located at the
-	diretory given for the daily transaction file filename
-	*/
-#endif
+	string fileName(filePath + "\\" + to_string(fileNameTime.tm_year + 1900) + "-" + to_string(fileNameTime.tm_mon + 1) + "-" +
+		to_string(fileNameTime.tm_mday) + ".atf");
+	ofstream dTFWriter(fileName, ios::app);
+
 	ostream_iterator<string> out_it(dTFWriter, "\n");
 	copy(dailyTransactionFile.begin(), dailyTransactionFile.end(), out_it);
 	dTFWriter.close();

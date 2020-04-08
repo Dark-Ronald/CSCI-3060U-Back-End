@@ -40,7 +40,7 @@ public class FileIO{
             FileIO.transactionFilePath = "";
         }
         else {
-            FileIO.transactionFilePath = transactionFilePath;
+            FileIO.transactionFilePath = transactionFilePath + "\\";
         }
     }
 

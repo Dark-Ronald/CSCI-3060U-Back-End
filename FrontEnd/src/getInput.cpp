@@ -8,7 +8,7 @@
 
 using namespace std;
 
-string getInputWithSpaces(string prompt, string errorMsg, int maxLength) {
+string getInputWithSpaces(string prompt, string errorMsg, int maxLength, bool padString) {
 	char* input = new char[maxLength + 1];
 	bool validInput = false;
 	while (!validInput) {
@@ -32,8 +32,13 @@ string getInputWithSpaces(string prompt, string errorMsg, int maxLength) {
 			validInput = true;
 		}
 	}
-
-	string retInput = pad(string(input), maxLength, ' ', 'l');
+	string retInput;
+	if (padString) {
+		retInput = pad(string(input), maxLength, ' ', 'l');
+	}
+	else {
+		retInput = string(input);
+	}
 	delete[] input;
 	return retInput;
 }

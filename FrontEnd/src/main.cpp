@@ -62,13 +62,13 @@ int main(int argc, char** argv) {
 #if(_DEBUG)
 		checkTestEnd
 #endif
-		command = getInputWithSpaces("", "Error: Invalid Input", 5);
-		while (command.compare("login") != 0) {
+		command = getInputWithSpaces("", "Error: Not Logged In", 5, false);
+		if (command.compare("exit") == 0) {
+			break;
+		}
+		else if (command.compare("login") != 0) {
 			cout << "Error: Not Logged In" << endl;
-#if(_DEBUG)
-			checkTestEnd
-#endif
-			command = getInputWithSpaces("", "Error: Invalid Input", 5);
+			continue;
 		}
 		session* newSession;
 		if ((newSession = session::login()) != NULL) {

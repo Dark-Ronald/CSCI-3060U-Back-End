@@ -39,7 +39,7 @@ void session::advertise() {
 		cout << "Error: You Do Not Have Privileges To Perform This Transaction" << endl;
 		return;
 	}
-	string itemName = getInputWithSpaces("Enter Item Name: ", "Error: Invalid Name", 19);
+	string itemName = getInputWithSpaces("Enter Item Name: ", "Error: Invalid Name", 19, true);
 	string minBid = getMonetaryInputAsString("Enter Minimum Bid: ", [](string input) {
 		double val = stod(input);
 		if (val < 0) {
@@ -55,6 +55,15 @@ void session::advertise() {
 	string period;
 	bool validPeriod = false;
 	while (!validPeriod) {
+		period = getInputWithSpaces("Enter Number Of Days Until Auction Ends: ", "Error: Invalid Input", 3, false);
+		try {
+			stoi(period);
+		}
+		catch (exception e) {
+			cout << "Error: Invalid Input" << endl;
+			continue;
+		}
+		/*
 		cout << "Enter Number Of Days Until Auction Ends: ";
 #if(_DEBUG)
 		checkTestEnd
@@ -63,7 +72,8 @@ void session::advertise() {
 		if (cin.peek() != '\n') {
 			cout << "Error: Invalid Input" << endl;
 		}
-		else if (stoi(period) < 0) { //assume days until auction starts when item becomes available
+		*/
+		if (stoi(period) < 0) { //assume days until auction starts when item becomes available
 			cout << "Error: Number Of Days Until Auction Ends Cannot Be Negative" << endl;
 		}
 		else if (stoi(period) > 100) {
@@ -102,7 +112,7 @@ void session::bid() {
 	vector<string> availableItems = FileReader::getAvailableItems();
 	bool itemFound = false;
 	while (!itemFound) {
-		itemName = getInputWithSpaces("Enter Item: ", "Error: Invalid Name", 19);
+		itemName = getInputWithSpaces("Enter Item: ", "Error: Invalid Name", 19, true);
 		for (string line : availableItems) {
 			if (line.substr(0, 19).compare(itemName) == 0) {
 				itemFound = true;
@@ -115,7 +125,7 @@ void session::bid() {
 	}
 	bool sellerFound = false;
 	while (!sellerFound) {
-		sellerName = getInputWithSpaces("Enter Seller Username: ", "Error: Invalid Name", 15);
+		sellerName = getInputWithSpaces("Enter Seller Username: ", "Error: Invalid Name", 15, true);
 		for (string line : availableItems) {
 			if (line.substr(20, 15).compare(sellerName) == 0) {
 				sellerFound = true;
@@ -171,7 +181,7 @@ void session::create() {
 	string newUsername;
 	bool validName = false;
 	while (!validName) {
-		newUsername = getInputWithSpaces("Enter Username For New User: ", "Error: Invalid Name", 15);
+		newUsername = getInputWithSpaces("Enter Username For New User: ", "Error: Invalid Name", 15, true);
 		vector<string> currentUserAccounts = FileReader::getCurrentUserAccounts();
 		bool cont = false;
 		for (int i = 0; i < currentUserAccounts.size() - 1; i++) {
@@ -187,9 +197,10 @@ void session::create() {
 		break;
 	}
 
-	cout << "Enter Type For New User: ";
 	string newUserType;
 	while (true) {
+		newUserType = getInputWithSpaces("Enter Type For New User: ", "Error: New User Type Must Be One Of(admin, full - standard, buy - standard, sell - standard)", 20, false);
+		/*
 #if(_DEBUG)
 		checkTestEnd
 #endif
@@ -197,7 +208,8 @@ void session::create() {
 		if (cin.peek() != '\n') {
 			cout << "Error: Invalid Input" << endl;
 		}
-		else if (newUserType.compare("admin") == 0) {
+		*/
+		if (newUserType.compare("admin") == 0) {
 			newUserType = "AA";
 			break;
 		}
@@ -229,13 +241,13 @@ void session::create() {
 }
 
 void session::addCredit() {
-	user* userToAddTo;
+	user* userToAddTo = userObject;
 	double creditAmount;
 
 	if ((userObject->getUserType() & (user::ADMIN)) == userObject->getUserType()) {
 		bool validUser = false;
 		while (!validUser) {
-			string userName = getInputWithSpaces("Enter User Name To Add Credit To: ", "Error: Invalid User Name", 15);
+			string userName = getInputWithSpaces("Enter User Name To Add Credit To: ", "Error: Invalid User Name", 15, true);
 			vector<string> currentUserAccounts = FileReader::getCurrentUserAccounts();
 
 			for (string line : currentUserAccounts) {
@@ -249,9 +261,6 @@ void session::addCredit() {
 				cout << "Error: No User With That Name Exists" << endl;
 			}
 		}
-	}
-	else {
-		userToAddTo = userObject;
 	}
 
 	while (true) {
@@ -447,7 +456,7 @@ void session::refund() {
 
 	bool validBuyerName = false;
 	while (!validBuyerName) {
-		buyerName = getInputWithSpaces("Enter Buyer User Name: ", "Error: Invalid User Name", 15);
+		buyerName = getInputWithSpaces("Enter Buyer User Name: ", "Error: Invalid User Name", 15, true);
 		
 		for (string line : currentUserAccounts) {
 			if (line.substr(0, 15).compare(buyerName) == 0) {
@@ -462,7 +471,7 @@ void session::refund() {
 
 	bool validSellerName = false;
 	while (!validSellerName) {
-		sellerName = getInputWithSpaces("Enter Seller User Name: ", "Error: Invalid User Name", 15);
+		sellerName = getInputWithSpaces("Enter Seller User Name: ", "Error: Invalid User Name", 15, true);
 
 		for (string line : currentUserAccounts) {
 			if (line.substr(0, 15).compare(sellerName) == 0) {
@@ -493,7 +502,9 @@ void session::refund() {
 	transaction += buyerName;
 	transaction += " ";
 	transaction += sellerName;
-	transaction += amount;
+	transaction += " ";
+	transaction += pad(amount, 9, '0', 'r');
+	transactionFileWriter::add(transaction);
 }
 
 //deletes user
@@ -508,7 +519,7 @@ void session::deleteUser() {
 	string userToDelete;
 	bool validUser = false;
 	while (!validUser) {
-		userToDelete = getInputWithSpaces("Enter Username of User to Delete: ", "Error: Invalid Username", 15);
+		userToDelete = getInputWithSpaces("Enter Username of User to Delete: ", "Error: Invalid Username", 15, true);
 		vector<string> currentUserAccounts = FileReader::getCurrentUserAccounts();
 
 		for (string line : currentUserAccounts) {
@@ -540,7 +551,7 @@ and returns a new session
 if name is not found returns null
 */
 session* session::login() {
-	string username = getInputWithSpaces("Enter Username: ", "Error: Invalid Username", 15);
+	string username = getInputWithSpaces("Enter Username: ", "Error: Invalid Username", 15, true);
 	username = pad(username, 15, ' ', 'l');
 	vector<string> currentUserAccounts = FileReader::getCurrentUserAccounts();
 	
@@ -558,7 +569,7 @@ void session::sessionLoop() {
 #if(_DEBUG)
 		checkTestEnd
 #endif
-		command = getInputWithSpaces("", "Error: Invalid Input", 20);
+		command = getInputWithSpaces("", "Error: Invalid Input", 20, false);
 
 		if (command.compare("login") == 0) {
 			cout << "Error: Already Logged In" << endl;
