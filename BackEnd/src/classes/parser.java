@@ -74,7 +74,7 @@ public class parser {
         
         for (Item item : availableItems){
             //if item name and seller's name matches, check if the bid is greater than the current price
-            if (item.getItemName().compareTo(itemName) == 0) && (item.getSellerName().compareTo(sellerName) == 0)) {
+            if ((item.getItemName().compareTo(itemName) == 0) && (item.getSellerName().compareTo(sellerName) == 0)) {
                 if (item.getBidPrice() < bidderBid) {
                     item.setBidderName(bidderName);
                     item.setBidPrice(bidderBid);
