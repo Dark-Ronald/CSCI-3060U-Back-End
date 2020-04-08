@@ -1,6 +1,7 @@
 package classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Collections;
@@ -64,8 +65,24 @@ public class parser {
     input: transaction: a line of the daily_transaction file with bid code
     output: None
      */
-    public static void bid(String transaction) {
 
+    static void bid(String transaction) {
+        String itemName = transaction.substring(3, 22);
+        String sellerName = transaction.substring(23, 36);
+        String bidderName = transaction.substring(37, 50);
+        double bidderBid = Double.valueOf(transaction.substring(51,56));
+        
+        for (Item item : availableItems){
+            //if item name and seller's name matches, check if the bid is greater than the current price
+            if (item.getItemName().compareTo(itemName) == 0) && (item.getSellerName().compareTo(sellerName) == 0)) {
+                if (item.getBidPrice() < bidderBid) {
+                    item.setBidderName(bidderName);
+                    item.setBidPrice(bidderBid);
+                }
+                return;
+            }
+        }
+        System.out.println("ERROR: Item Not Being Auctioned By Seller.  Transaction: " + transaction);
     }
 
     /*

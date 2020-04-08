@@ -6,14 +6,14 @@ each item class, user the simple getter and setter methods, as well as the toStr
 functionallity
 Input: All of the different information nessesary for a single item
 */
+
 public class Item {
 
     private String itemName;
     private String sellerName;
     private String highestBidderName;
     private double bidPrice;
-    private short remaningDays; 
-
+    private short remaningDays;
     /*
     Description: A simple constructor for the class, storing all of the nessesary information
     Input: itemName: What the name of the item is, sellerName: the user putting the item up for auction
@@ -180,5 +180,4 @@ public class Item {
     	
     	return true;
     }
-    
 }
