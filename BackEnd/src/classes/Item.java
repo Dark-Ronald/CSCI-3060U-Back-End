@@ -31,7 +31,12 @@ public class Item {
         	this.bidPrice = Double.valueOf(bidPrice);
         } catch (NumberFormatException e) {
         	//replace with print to error file
-        	System.out.printf("Value of passed bid price for item \"%s\" was not a string\n", itemName);
+        	System.out.println("ERROR: Item Bid Price Is Not A Number.  Item Listing: " +
+                    itemName + " " +
+                    sellerName + " " +
+                    highestBidderName + " " +
+                    remainingDays + " " +
+                    bidPrice);
         	throw new NumberFormatException();
         }
         
@@ -39,7 +44,12 @@ public class Item {
         	this.remaningDays = Short.valueOf(remainingDays);
         }catch (NumberFormatException e) {
         	//replace with print to error file
-        	System.out.printf("Value of passed remaining days for item \"%s\" was not a string\n", itemName);
+        	System.out.printf("ERROR: Item Days To Auction Is Not A Number.  Item Listing: " +
+                    itemName + " " +
+                    sellerName + " " +
+                    highestBidderName + " " +
+                    remainingDays + " " +
+                    bidPrice);
         	throw new NumberFormatException();
         }
     }

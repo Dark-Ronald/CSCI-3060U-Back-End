@@ -49,7 +49,10 @@ public class user {
         try {
         	this.credit = Double.valueOf(credit);
         } catch (NumberFormatException e) {
-        	System.out.printf("The credit passed by user \"%s\" was not a number\n", username);
+        	System.out.printf("ERROR: User Credit Is Not A Number.  User Listing: " +
+                username + " " +
+                userType + " " +
+                credit);
         	throw new NumberFormatException();
         }
     }

@@ -12,39 +12,6 @@ public class parser {
     protected static ArrayList<user> currentUserAccounts = new ArrayList<user>();
     protected static ArrayList<Item> availableItems = new ArrayList<Item>();
     protected static Date datePreviouslyRun;
-
-    //used for testing purposes
-    public static void addUsers(user... users) {
-    	for(user newUser : users)
-    		currentUserAccounts.add(newUser);
-    }
-    
-    public static void clearUsers() {
-    	currentUserAccounts.clear();
-    }
-    
-    public static user searchUser(String name) {
-    	for(user u: currentUserAccounts) {
-    		if(u.getUsername().equals(name)) return u;
-    	}
-    	return null;
-    }
-    
-    public static void addItems(Item... items) {
-    	for(Item item : items)
-    		availableItems.add(item);
-    }
-    
-    public static void clearItems() {
-    	availableItems.clear();
-    }
-    
-    public static Item searchItem(String name) {
-    	for(Item item: availableItems) {
-    		if(item.getItemName().equals(name)) return item;
-    	}
-    	return null;
-    }
     
     /*
     gets the user to add credit to, then sets their credit to the credit value in the
@@ -54,24 +21,27 @@ public class parser {
      */
     public static void addCredit(String transaction) {
         String username = transaction.substring(3, 18);
-        double credit = 0.0;
+        double credit = 0;
         
         try {
         	credit = Double.valueOf(transaction.substring(22, 31));
         } catch(NumberFormatException e) {
-        	System.out.printf("Credit for addCredit transaction by user \"%s\" is not a number\n", username);
-        	throw new NumberFormatException();
+        	System.out.printf("ERROR: Credit Is Not A Number.  Transaction: " + transaction);
+        	return;
         }
         
         for (user userAccount : currentUserAccounts) {
             if (username.compareTo(userAccount.getUsername()) == 0) {
+                if (userAccount.getCredit() + credit > 999999.00) {
+                    System.out.println("ERROR: Adding Credit To User Account Causes User Credit To Exceed Maximum.  Transaction: " + transaction);
+                    return;
+                }
                 userAccount.setCredit(credit + userAccount.getCredit());
                 return;
             }
         }
         
-        System.out.printf("User \"%s\" does not exist!\n", username);
-        throw new NoSuchElementException();
+        System.out.printf("ERROR: User Does Not Exist.  Transaction: " + transaction);
     }
 
     /*
@@ -108,7 +78,7 @@ public class parser {
         for (user user : currentUserAccounts) {
             if (user.getUsername().compareTo(username) == 0) {
                 System.out.println("ERROR: Creation Of New User With Existing Name.  Transaction: " + transaction);
-                throw new IllegalArgumentException();
+
             }
         }
         String userType = transaction.substring(19, 21);
@@ -247,11 +217,11 @@ public class parser {
                         double sellerCredit = sellerAccount.getCredit();
                         if (sellerCredit - credit < 0) {
                             System.out.println("ERROR: Seller Doesn't Have Enough Credit For Refund.  Transaction: " + transaction);
-                            throw new IllegalArgumentException(); 
+                            return;
                         }
                         else if (buyerCredit + credit > 999999) {
                             System.out.println("ERROR: Refund Causes Buyers Credit To Exceed Maximum User Credit.  Transaction: " + transaction);
-                            throw new IllegalArgumentException();
+                            return;
                         }
                         else {
                             sellerAccount.setCredit(sellerCredit - credit);
@@ -260,12 +230,12 @@ public class parser {
                         }
                     }
                 }
-                System.out.println("The Sellers username does not exist");
-                throw new NoSuchElementException();
+                System.out.println("ERROR: Sellers Username In Refund Does Not Exist.  Transaction: " + transaction);
+                return;
             }
         }
-        System.out.println("The Buyers username does not exist");
-        throw new NoSuchElementException();
+        System.out.println("ERROR: Buyers Username In Refund Does Not Exist.  Transaction: " + transaction);
+
     }
 
     public static void clean() {
