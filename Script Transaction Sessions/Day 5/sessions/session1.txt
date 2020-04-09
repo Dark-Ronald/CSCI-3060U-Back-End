@@ -1,0 +1,7 @@
+login
+admin1
+create
+new user 2
+sell-standard
+logout
+exit

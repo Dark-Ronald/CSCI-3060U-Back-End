@@ -1,0 +1,7 @@
+login
+admin1
+create
+new user
+full-standard
+logout
+exit

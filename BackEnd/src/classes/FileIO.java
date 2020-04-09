@@ -53,11 +53,12 @@ public class FileIO{
            items: a pointer to an Item ArrayList
     Outputs: true if there exists new data to process, false otherwise
     */
-    public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items){
+    public static boolean readFiles(ArrayList<user> users, ArrayList<Item> items) {
         readMeta();
         if (!getDTFList()) {
             return false;
         }
+        //System.out.println("file: " + currentTransactionFilePath.toString());
         BufferedReader dailyTransactionFileReader = null;
         BufferedReader currentUserAccountsReader = null;
 
@@ -231,11 +232,14 @@ public class FileIO{
     returns false if there are no daily transaction files in transactionFilePath
      */
     private static boolean getDTFList() {
+        //System.out.println("transaction file path: " + transactionFilePath);
         Path transactionFilesDir = Paths.get(transactionFilePath).toAbsolutePath();
+        //System.out.println("transaction files directory: " + transactionFilesDir.toString());
         int i = 0;
         dTFListIDefault = 0;
         for (File f : transactionFilesDir.toFile().listFiles()) {
             Path p = f.toPath();
+            //System.out.println("path: " + p.toString());
             if ((currentTransactionFilePath != null) && (p.compareTo(currentTransactionFilePath) == 0)) {
                 dTFListIDefault = i;
             }
@@ -251,9 +255,10 @@ public class FileIO{
         }
 
         if (dTFList.size() == 0) {
+            //System.out.println("returning false");
             return false;
         }
-
+        //System.out.println("list[0]: " + dTFList.get(0).toString());
         dTFList.sort(new pathComparator());
         if (currentTransactionFilePath == null) {
             currentTransactionFilePath = dTFList.get(0);
@@ -284,7 +289,8 @@ public class FileIO{
 
     private static void updateMeta() {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("meta.inf"));
+            //System.out.println("writing to: " + transactionFilePath + "meta.inf");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(transactionFilePath + "meta.inf"));
             if (!fileComplete) {
                 writer.write(currentTransactionFilePath.getFileName().toString());
                 writer.newLine();
@@ -304,8 +310,9 @@ public class FileIO{
 
     private static void readMeta() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("meta.inf"));
-            currentTransactionFilePath = Paths.get(reader.readLine()).toAbsolutePath();
+            BufferedReader reader = new BufferedReader(new FileReader(transactionFilePath + "meta.inf"));
+            //System.out.println("meta found");
+            currentTransactionFilePath = Paths.get(transactionFilePath + reader.readLine()).toAbsolutePath();
             lineLeftAt = Integer.valueOf(reader.readLine());
             reader.close();
             getDTFList();

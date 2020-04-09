@@ -1,0 +1,8 @@
+login
+userSS
+advertise
+new item
+80
+19
+logout
+exit

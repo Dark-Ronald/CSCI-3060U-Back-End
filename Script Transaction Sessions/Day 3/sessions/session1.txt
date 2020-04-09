@@ -1,0 +1,6 @@
+login
+new user
+addcredit
+4000
+logout
+exit

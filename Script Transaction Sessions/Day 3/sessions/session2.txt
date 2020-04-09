@@ -1,0 +1,8 @@
+login
+admin1
+refund
+userBS
+userFS
+19
+logout
+exit

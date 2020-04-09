@@ -306,10 +306,6 @@ void session::addCredit() {
 		break;
 	}
 
-	if (userToAddTo == userObject) {
-		userObject->addCredit(creditAmount);
-	}
-
 	stringstream ss;
 	ss << fixed << setprecision(2) << creditAmount;
 
@@ -608,7 +604,9 @@ session::session(user* userObject) {
 
 session::~session() {
 	for (user* user : userCreditTracker) {
-		delete user;
+		if (user != userObject) {
+			delete user;
+		}
 	}
 	delete userObject;
 }

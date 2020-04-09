@@ -1,0 +1,8 @@
+login
+userBS
+bid
+item2
+userFS
+300
+logout
+exit

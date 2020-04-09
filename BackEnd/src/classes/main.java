@@ -37,8 +37,15 @@ public class main {
      */
     public static void main(String[] args) throws java.lang.InterruptedException {
         String transactionFilesPath = null;
-        if (args.length == 3) {
+
+        boolean script = false;
+        if (args.length >= 3) {
             transactionFilesPath = args[2];
+            if (args[3].compareTo("script") == 0) {
+                script = true;
+                newDay.set(true);
+                System.out.println("Script");
+            }
         }
         FileIO.setPaths(args[0], args[1], transactionFilesPath);
 
@@ -50,26 +57,32 @@ public class main {
 
         connectionHandler.init();
         setMidnightTimer();
+        boolean newDayFlag = false;
 
         while(!shutdown.get()) {
             boolean sleep = true;
-            boolean newDayFlag = false;
             if (FileIO.readFiles(parser.currentUserAccounts, parser.availableItems) && !newDay.get()) {
 
                 processDailyTransactionFile();
-                if (newDayFlag){
+                if (newDayFlag) {
                     runAuctionDay(parser.currentUserAccounts, parser.availableItems);
+                    newDayFlag = false;
                 }
                 FileIO.writeFiles(parser.currentUserAccounts, parser.availableItems);
+                if (script) {
+                    shutdown.set(true);
+                    break;
+                }
                 parser.clean();
-            }
-            else if (newDay.get() && !FileIO.fileComplete) {
+            } else if (newDay.get() && !FileIO.fileComplete) {
                 newDay.set(false);
                 newDayFlag = true;
                 sleep = false;
-                synchronized (shutdown) {
-                    while (!shutdown.get()) {
-                        shutdown.wait(300000); //wait 5 minutes for front ends to write out file
+                if (!script) {
+                    synchronized (shutdown) {
+                        while (!shutdown.get()) {
+                            shutdown.wait(300000); //wait 5 minutes for front ends to write out file
+                        }
                     }
                 }
             }
@@ -225,6 +238,7 @@ class getUserInput implements Runnable{
 class midnightTask extends TimerTask implements Runnable {
     public void run() {
         synchronized (main.wakeup) {
+            main.newDay.set(true);
             main.wakeup.set(true);
             main.wakeup.notify();
         }

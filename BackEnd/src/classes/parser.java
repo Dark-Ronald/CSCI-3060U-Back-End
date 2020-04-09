@@ -95,7 +95,7 @@ public class parser {
         for (user user : currentUserAccounts) {
             if (user.getUsername().compareTo(username) == 0) {
                 System.out.println("ERROR: Creation Of New User With Existing Name.  Transaction: " + transaction);
-
+                return;
             }
         }
         String userType = transaction.substring(19, 21);

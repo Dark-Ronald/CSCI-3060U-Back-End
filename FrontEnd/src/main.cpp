@@ -12,7 +12,7 @@
 #include "main.h"
 #include <csetjmp>
 std::jmp_buf testExit;
-#define checkTestEnd if (cin.peek() == EOF) { longjmp(testExit, 1); }
+#define checkTestEnd if (cin.peek() == EOF) { longjmp(testExit, 2); }
 #endif
 
 using namespace std;
@@ -54,8 +54,13 @@ int main(int argc, char** argv) {
 
 	string command;
 #if(_DEBUG)
-	if (_setjmp(testExit) == 1) {
+	int val;
+	val = _setjmp(testExit);
+	if (val == 1) {
 		goto testExitL;
+	}
+	else if (val == 2) {
+		goto testExitNoWrite;
 	}
 #endif
 	while (true) {
@@ -81,7 +86,10 @@ int main(int argc, char** argv) {
 	}
 #if(_DEBUG)
 testExitL:
-	transactionFileWriter::writeOut();
+	if (val == 1) {
+		transactionFileWriter::writeOut();
+	}
+testExitNoWrite:
 #endif
 	transactionFileWriter::shutdown();
 	fileReaderThread.join();

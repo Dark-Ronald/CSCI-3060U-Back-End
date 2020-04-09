@@ -1,0 +1,6 @@
+login
+userBS
+addcredit
+500
+logout
+exit
